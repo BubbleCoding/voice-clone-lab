@@ -8,7 +8,11 @@ from .state import LabError
 
 MODEL = None
 MODEL_VERSION = None
+VERSION = "v3"  # preferred checkpoint; the setup cell can switch to "v2" for comparison
 _conditioned_on = None
+
+# Chatterbox defaults. Free mode lets students (and the dry run) change these.
+GENERATION_DEFAULTS = {"exaggeration": 0.5, "cfg_weight": 0.5, "temperature": 0.8}
 
 
 def device():
@@ -21,15 +25,16 @@ def device():
 
 
 def load_model(dev=None):
-    """Load Chatterbox Multilingual V3, falling back to V2 on releases without t3_model."""
+    """Load Chatterbox Multilingual (VERSION), falling back to V2 on releases without t3_model."""
     global MODEL, MODEL_VERSION
-    if MODEL is not None:
+    if MODEL is not None and MODEL_VERSION == VERSION:
         return MODEL
+    unload()
     from chatterbox.mtl_tts import ChatterboxMultilingualTTS
     dev = dev or device()
     try:
-        MODEL = ChatterboxMultilingualTTS.from_pretrained(device=dev, t3_model="v3")
-        MODEL_VERSION = "v3"
+        MODEL = ChatterboxMultilingualTTS.from_pretrained(device=dev, t3_model=VERSION)
+        MODEL_VERSION = VERSION
     except TypeError:
         MODEL = ChatterboxMultilingualTTS.from_pretrained(device=dev)
         MODEL_VERSION = "v2"
@@ -53,14 +58,14 @@ def clone_path(sentence_id, seconds):
 
 @state.requires_consent
 def make_references():
-    """Cut the live reading recording into 3, 6 and 10 s of pure speech."""
+    """Cut the live reading recording into 3, 6 and 10 s of mostly speech, with natural rhythm."""
     src = state.verified_recording("reference")
-    speech = audio.speech_only(audio.load(src))
+    speech = audio.compress_pauses(audio.load(src))
     if audio.duration(speech) < max(texts.REF_LENGTHS):
         raise LabError(f"Te weinig spraak in je opname ({audio.duration(speech):.1f} s). Neem de leestekst opnieuw op.")
     paths = {}
     for seconds in texts.REF_LENGTHS:
-        path = audio.save(reference_path(seconds), audio.normalize_loudness(audio.cut(speech, seconds)))
+        path = audio.save(reference_path(seconds), audio.normalize_loudness(audio.cut(speech, seconds, fade_s=0.02)))
         state.register_derived(path)
         paths[seconds] = path
     return paths
@@ -77,12 +82,13 @@ def _condition(ref):
         _conditioned_on = (ref, ref.stat().st_mtime_ns)
 
 
-def _generate(text, lang, ref, dst):
+def _generate(text, lang, ref, dst, **settings):
     if MODEL is None:
         raise LabError("Het model is niet geladen. Voer eerst de setupcel (stap 1) uit.")
     _condition(ref)
+    params = {**GENERATION_DEFAULTS, **settings}
     t0 = time.perf_counter()
-    wav = MODEL.generate(text, language_id=lang).squeeze(0).cpu().numpy()
+    wav = MODEL.generate(text, language_id=lang, **params).squeeze(0).cpu().numpy()
     elapsed = time.perf_counter() - t0
     audio.save(dst, wav, MODEL.sr)
     return {"audio_s": round(len(wav) / MODEL.sr, 1), "gen_s": round(elapsed, 1)}
@@ -116,7 +122,7 @@ def check_free_text(text):
 
 
 @state.requires_consent
-def generate_free(text, lang="nl", seconds=10):
+def generate_free(text, lang="nl", seconds=10, **settings):
     text = check_free_text(text)
     if lang not in ("nl", "en"):
         raise LabError("Kies Nederlands of Engels.")
@@ -127,5 +133,5 @@ def generate_free(text, lang="nl", seconds=10):
         make_references()
     n = len(list(state.subdir("clones").glob("vrij_*.wav"))) + 1
     dst = state.subdir("clones") / f"vrij_{n:02d}_{seconds}s.wav"
-    timing = _generate(text, lang, ref, dst)
+    timing = _generate(text, lang, ref, dst, **settings)
     return {"path": dst, **timing}

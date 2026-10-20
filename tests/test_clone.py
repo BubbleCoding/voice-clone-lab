@@ -49,3 +49,10 @@ def test_free_mode_refuses(text, recordings, fake_model):
 def test_free_mode_generates(recordings, fake_model):
     result = clone.generate_free("Het regent vandaag in Amsterdam.", "nl", 6)
     assert result["path"].exists() and result["path"].name.startswith("vrij_")
+    assert fake_model.settings == clone.GENERATION_DEFAULTS
+
+
+def test_free_mode_passes_settings(recordings, fake_model):
+    clone.generate_free("Het regent vandaag in Amsterdam.", "nl", 10, cfg_weight=0.2, temperature=0.6)
+    assert fake_model.settings["cfg_weight"] == 0.2 and fake_model.settings["temperature"] == 0.6
+    assert fake_model.settings["exaggeration"] == clone.GENERATION_DEFAULTS["exaggeration"]

@@ -22,6 +22,7 @@ Voer de cellen van boven naar beneden uit met ▶ of Shift+Enter. Code en uitleg
 
 SETUP = f'''#@title 1. Setup: start deze cel meteen (duurt ongeveer 4 minuten)
 PLAYER = "proxy"  #@param ["proxy", "embed"]
+MODEL = "v3"  #@param ["v3", "v2"]
 import os
 REPO_URL = "{REPO_URL}"
 REPO_DIR = "/content/voice-clone-lab"
@@ -31,7 +32,7 @@ if not os.path.isdir(REPO_DIR):
 if not os.path.exists("/content/.vcl_installed"):
     !bash scripts/install_colab.sh && touch /content/.vcl_installed
 import lab.cells as lab
-lab.setup(player_mode=PLAYER)'''
+lab.setup(player_mode=PLAYER, model=MODEL)'''
 
 CELLS = [
     ("md", INTRO),

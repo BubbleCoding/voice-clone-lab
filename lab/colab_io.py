@@ -23,7 +23,9 @@ async function vclRecord(maxSeconds, label) {
   start.disabled = true;
   let stream;
   try {
-    stream = await navigator.mediaDevices.getUserMedia({audio: true});
+    // Browser voice processing (noise suppression, AGC) muffles the voice the model copies.
+    stream = await navigator.mediaDevices.getUserMedia({audio: {
+      echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: 1}});
   } catch (e) {
     status.textContent = 'Geen toegang tot de microfoon: ' + e.message;
     return JSON.stringify({error: 'mic: ' + e.message});
@@ -32,7 +34,12 @@ async function vclRecord(maxSeconds, label) {
     status.textContent = 'Opname begint over ' + n + '...';
     await new Promise(r => setTimeout(r, 1000));
   }
-  const recorder = new MediaRecorder(stream);
+  let recorder;
+  try {
+    recorder = new MediaRecorder(stream, {audioBitsPerSecond: 128000});
+  } catch (e) {
+    recorder = new MediaRecorder(stream);
+  }
   const chunks = [];
   recorder.ondataavailable = e => chunks.push(e.data);
   const done = new Promise(resolve => recorder.onstop = resolve);

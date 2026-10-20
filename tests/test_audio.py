@@ -8,10 +8,20 @@ from conftest import speechlike
 needs_ffmpeg = pytest.mark.skipif(audio.ffmpeg_bin() is None, reason="ffmpeg not available")
 
 
-def test_speech_only_removes_silence():
-    wav = np.concatenate([np.zeros(audio.SR), speechlike(5), np.zeros(2 * audio.SR)]).astype(np.float32)
-    speech = audio.speech_only(wav)
-    assert 3.0 < audio.duration(speech) < 5.5
+def test_compress_pauses_shortens_only_long_pauses():
+    sr = audio.SR
+    tone = speechlike(2)
+    long_gap = np.zeros(2 * sr, dtype=np.float32)
+    wav = np.concatenate([tone, long_gap, tone])
+    out = audio.compress_pauses(wav)
+    # The 2 s pause shrinks to about 0.3 s; speech (and its own short pauses) stays.
+    assert audio.duration(out) == pytest.approx(audio.duration(wav) - 1.7, abs=0.35)
+    assert audio.speech_seconds(out) == pytest.approx(audio.speech_seconds(wav), abs=0.1)
+
+
+def test_compress_pauses_keeps_short_pauses():
+    wav = speechlike(5)  # bursts with 0.25 s gaps
+    assert audio.duration(audio.compress_pauses(audio.trim(wav))) == pytest.approx(audio.duration(audio.trim(wav)), abs=0.05)
 
 
 def test_cut_and_normalize():

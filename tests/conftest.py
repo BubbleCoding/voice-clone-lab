@@ -69,7 +69,8 @@ class FakeModel:
     def prepare_conditionals(self, path, exaggeration=0.5):
         self.conditioned.append(path)
 
-    def generate(self, text, language_id):
+    def generate(self, text, language_id, **settings):
+        self.settings = settings
         n = int(self.sr * (0.06 * len(text) + 0.5))
         return _Tensor((0.2 * np.sin(2 * np.pi * 180 * np.arange(n) / self.sr)).astype(np.float32))
 

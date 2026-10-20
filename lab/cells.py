@@ -40,8 +40,9 @@ def _require_colab(what):
 # 1. Setup
 
 @friendly
-def setup(player_mode="proxy"):
+def setup(player_mode="proxy", model="v3"):
     player.MODE = player_mode
+    clone.VERSION = model
     t0 = time.perf_counter()
     print("Modellen laden en controleren. Dit duurt een paar minuten...\n")
     results = checks.run()
@@ -102,7 +103,7 @@ def record_reference():
                f"<blockquote style='font-size:20px;line-height:1.5'>{html.escape(texts.READING_PASSAGE)}</blockquote>")
 
     def check(wav):
-        speech = audio.duration(audio.speech_only(wav))
+        speech = audio.speech_seconds(wav)
         if speech < texts.MIN_REFERENCE_SPEECH_S:
             raise LabError(f"Te weinig spraak opgenomen ({speech:.0f} s, minimaal {texts.MIN_REFERENCE_SPEECH_S:.0f} s). "
                            "Voer deze cel opnieuw uit en lees de hele tekst voor.")
@@ -164,6 +165,16 @@ def free_mode():
     lang = w.Dropdown(options=[("Nederlands", "nl"), ("Engels", "en")], description="Taal:")
     seconds = w.Dropdown(options=[(f"{s} s", s) for s in texts.REF_LENGTHS], value=max(texts.REF_LENGTHS),
                          description="Referentie:")
+    d = clone.GENERATION_DEFAULTS
+    style = {"description_width": "110px"}
+    exaggeration = w.FloatSlider(value=d["exaggeration"], min=0.25, max=1.5, step=0.05, description="Expressie:", style=style)
+    cfg_weight = w.FloatSlider(value=d["cfg_weight"], min=0.0, max=1.0, step=0.05, description="CFG / tempo:", style=style)
+    temperature = w.FloatSlider(value=d["temperature"], min=0.4, max=1.2, step=0.05, description="Temperatuur:", style=style)
+    advanced = w.Accordion(children=[w.VBox([
+        w.HTML("<small>Lagere CFG = rustiger tempo en minder accent van de referentie. "
+               "Hogere expressie = dramatischer. Lagere temperatuur = stabieler.</small>"),
+        exaggeration, cfg_weight, temperature])])
+    advanced.set_title(0, "Geavanceerd")
     button = w.Button(description="Genereer", button_style="primary")
     out = w.Output()
 
@@ -172,7 +183,8 @@ def free_mode():
         with out:
             try:
                 button.disabled = True
-                result = clone.generate_free(text.value, lang.value, seconds.value)
+                result = clone.generate_free(text.value, lang.value, seconds.value, exaggeration=exaggeration.value,
+                                             cfg_weight=cfg_weight.value, temperature=temperature.value)
                 player.show(result["path"], f"{result['audio_s']} s audio in {result['gen_s']} s gegenereerd")
             except LabError as e:
                 _error(str(e))
@@ -180,7 +192,7 @@ def free_mode():
                 button.disabled = False
 
     button.on_click(on_click)
-    display(w.VBox([text, w.HBox([lang, seconds]), button, out]))
+    display(w.VBox([text, w.HBox([lang, seconds]), advanced, button, out]))
 
 
 # 6. Download

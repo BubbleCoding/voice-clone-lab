@@ -75,19 +75,47 @@ def trim(wav, top_db=40):
     return trimmed
 
 
-def speech_only(wav, sr=SR, top_db=40, gap_s=0.15):
-    """Keep only voiced parts, joined by short gaps, so '3 s of reference' means 3 s of speech."""
+def speech_seconds(wav, sr=SR, top_db=40):
+    """Seconds of non-silent audio."""
+    import librosa
+    return sum(end - start for start, end in librosa.effects.split(wav, top_db=top_db)) / sr
+
+
+def _fade(x, sr=SR, fade_s=0.01, fade_in=False, fade_out=False):
+    x = x.copy()
+    n = min(int(fade_s * sr), len(x))
+    if n:
+        if fade_in:
+            x[:n] *= np.linspace(0, 1, n, dtype=np.float32)
+        if fade_out:
+            x[-n:] *= np.linspace(1, 0, n, dtype=np.float32)
+    return x
+
+
+def compress_pauses(wav, sr=SR, top_db=40, max_pause_s=0.3):
+    """Shorten pauses longer than max_pause_s and keep everything else untouched.
+
+    The speech keeps its natural rhythm and onsets (the model copies rhythm too), while
+    '3 s of reference' still means about 3 s of mostly speech.
+    """
     import librosa
     intervals = librosa.effects.split(wav, top_db=top_db)
     if len(intervals) == 0:
         return np.zeros(0, dtype=np.float32)
-    gap = np.zeros(int(gap_s * sr), dtype=np.float32)
+    keep = int(max_pause_s * sr) // 2
     parts = []
+    prev_end = None
     for start, end in intervals:
-        if end - start < int(0.05 * sr):
-            continue  # clicks and breaths
-        parts.extend([wav[start:end], gap])
-    return np.concatenate(parts[:-1]) if parts else np.zeros(0, dtype=np.float32)
+        if prev_end is not None:
+            if start - prev_end > 2 * keep:
+                # Keep the edges of the pause (natural decay and breath-in), drop the middle.
+                parts.append(_fade(wav[prev_end:prev_end + keep], sr, fade_out=True))
+                parts.append(_fade(wav[start - keep:start], sr, fade_in=True))
+            else:
+                parts.append(wav[prev_end:start])
+        parts.append(wav[start:end])
+        prev_end = end
+    return np.concatenate(parts).astype(np.float32)
 
 
 def normalize_loudness(wav, sr=SR, target=TARGET_LUFS):
@@ -107,8 +135,8 @@ def normalize_loudness(wav, sr=SR, target=TARGET_LUFS):
     return out.astype(np.float32)
 
 
-def cut(wav, seconds, sr=SR):
-    return wav[: int(seconds * sr)]
+def cut(wav, seconds, sr=SR, fade_s=0.0):
+    return _fade(wav[: int(seconds * sr)], sr, fade_s, fade_out=True) if fade_s else wav[: int(seconds * sr)]
 
 
 def prepare_for_test(src, dst):
