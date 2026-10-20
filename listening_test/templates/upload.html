@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Uploaden{% endblock %}
+{% block content %}
+<h1>Clips uploaden</h1>
+{% if success %}
+  <p class="ok">Gelukt! De clips van paar {{ code }}, spreker {{ speaker }} staan klaar{% if replaced %} (de vorige upload is vervangen){% endif %}.</p>
+  <p><a class="big-link" href="{{ url_for('rate') }}">Ga beoordelen</a></p>
+{% else %}
+  {% if error %}<p class="error">{{ error }}</p>{% endif %}
+  <p>Upload de zip uit stap 6 van het notebook (bijvoorbeeld <code>K7QM-A.zip</code>). Elke spreker uploadt zijn of haar eigen zip.</p>
+  <form method="post" enctype="multipart/form-data">
+    <label>Paircode <input name="code" value="{{ code or '' }}" maxlength="4" autocomplete="off" required class="code-input"></label>
+    <fieldset>
+      <legend>Spreker</legend>
+      <label><input type="radio" name="speaker" value="A" {% if speaker != 'B' %}checked{% endif %}> A</label>
+      <label><input type="radio" name="speaker" value="B" {% if speaker == 'B' %}checked{% endif %}> B</label>
+    </fieldset>
+    <label>Zip-bestand <input type="file" name="file" accept=".zip,application/zip" required></label>
+    <button type="submit">Uploaden</button>
+  </form>
+{% endif %}
+{% endblock %}

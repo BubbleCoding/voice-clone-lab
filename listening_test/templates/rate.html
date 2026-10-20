@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Beoordelen{% endblock %}
+{% block content %}
+<h1>Echt of nep?</h1>
+<p class="muted">Paar {{ code }} · <span id="progress">…</span> · <a href="{{ url_for('logout') }}">andere code</a></p>
+<div id="player-box">
+  <audio id="player" controls preload="auto"></audio>
+  <p class="muted">Luister de clip af en kies.</p>
+  <div class="answers">
+    <button id="btn-echt" class="answer echt" disabled>Echt</button>
+    <button id="btn-nep" class="answer nep" disabled>Nep</button>
+  </div>
+</div>
+<div id="done" hidden>
+  <p class="ok">Je hebt alle beschikbare clips beoordeeld.</p>
+  <p id="my-score"></p>
+  <button id="btn-retry">Opnieuw kijken naar nieuwe clips</button>
+</div>
+<p id="status" class="error" hidden></p>
+<script>
+const player = document.getElementById('player');
+const btns = [document.getElementById('btn-echt'), document.getElementById('btn-nep')];
+let current = null;
+
+function setButtons(on) { btns.forEach(b => b.disabled = !on); }
+
+async function next() {
+  setButtons(false);
+  const res = await fetch('/api/next', {cache: 'no-store'});
+  if (res.status === 401) { location.reload(); return; }
+  const data = await res.json();
+  document.getElementById('progress').textContent = data.rated + ' van ' + data.available + ' beoordeeld';
+  if (data.done) {
+    current = null;
+    document.getElementById('player-box').hidden = true;
+    document.getElementById('done').hidden = false;
+    const me = await (await fetch('/api/me')).json();
+    document.getElementById('my-score').textContent =
+      me.n ? 'Jij had er ' + me.correct + ' van de ' + me.n + ' goed.' : '';
+    return;
+  }
+  document.getElementById('player-box').hidden = false;
+  document.getElementById('done').hidden = true;
+  current = data.clip_id;
+  player.src = data.url;
+  player.play().catch(() => {});
+}
+
+player.addEventListener('play', () => setButtons(true));
+
+async function answer(value) {
+  if (!current) return;
+  setButtons(false);
+  const status = document.getElementById('status');
+  try {
+    const res = await fetch('/api/rate', {method: 'POST', headers: {'Content-Type': 'application/json'},
+                                         body: JSON.stringify({clip_id: current, answer: value})});
+    if (!res.ok) throw new Error(res.status);
+    status.hidden = true;
+  } catch (e) {
+    status.textContent = 'Opslaan mislukt, probeer het nog eens.';
+    status.hidden = false;
+    setButtons(true);
+    return;
+  }
+  next();
+}
+
+btns[0].onclick = () => answer('echt');
+btns[1].onclick = () => answer('nep');
+document.getElementById('btn-retry').onclick = next;
+next();
+</script>
+{% endblock %}

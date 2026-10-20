@@ -1,0 +1,9 @@
+# For `make test` on a laptop: the lab package without the models.
+-r listening_test/requirements.txt
+pytest>=8
+librosa>=0.11
+pyloudnorm
+pandas
+imageio-ffmpeg
+ipython
+ipywidgets

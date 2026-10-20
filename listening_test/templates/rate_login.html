@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Beoordelen{% endblock %}
+{% block content %}
+<h1>Beoordelen</h1>
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+<p>Vul jullie paircode in. Je krijgt dan alleen clips van andere paren te horen.</p>
+<form method="post">
+  <label>Paircode <input name="code" value="{{ code or '' }}" maxlength="4" autocomplete="off" required class="code-input"></label>
+  <button type="submit">Start</button>
+</form>
+{% endblock %}

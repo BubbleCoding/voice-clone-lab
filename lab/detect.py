@@ -1,0 +1,106 @@
+"""Detection: a deepfake classifier and the Perth watermark, before and after degradation."""
+
+import time
+
+import numpy as np
+
+from . import audio, state
+
+CLASSIFIER_ID = "mo-thecreator/Deepfake-audio-detection"
+CLASSIFIER = None
+WATERMARKER = None
+
+VERSIONS = ("origineel", "mp3", "telefoon")
+
+
+def load_classifier():
+    global CLASSIFIER
+    if CLASSIFIER is None:
+        import torch
+        from transformers import pipeline
+        dev = 0 if torch.cuda.is_available() else -1
+        CLASSIFIER = pipeline("audio-classification", model=CLASSIFIER_ID, device=dev)
+    return CLASSIFIER
+
+
+def load_watermarker():
+    """The real Perth watermarker. perth silently sets the class to None if an import fails."""
+    global WATERMARKER
+    if WATERMARKER is None:
+        import perth
+        if perth.PerthImplicitWatermarker is None:
+            raise RuntimeError("perth.PerthImplicitWatermarker is None (a perth import failed; check setuptools<81)")
+        import torch
+        WATERMARKER = perth.PerthImplicitWatermarker(device="cuda" if torch.cuda.is_available() else "cpu")
+    return WATERMARKER
+
+
+def unload():
+    global CLASSIFIER, WATERMARKER
+    CLASSIFIER = None
+    WATERMARKER = None
+
+
+def watermark_score(wav, sr):
+    """Mean unrounded watermark prediction: about 1.0 for Chatterbox output, about 0.0 otherwise."""
+    pred = load_watermarker().get_watermark(wav, sample_rate=sr, round=False)
+    return float(np.mean(pred))
+
+
+def fake_score(wav, sr):
+    import librosa
+    wav16 = librosa.resample(wav, orig_sr=sr, target_sr=16000) if sr != 16000 else wav
+    scores = load_classifier()({"raw": wav16, "sampling_rate": 16000}, top_k=None)
+    return float(next(s["score"] for s in scores if s["label"].lower() == "fake"))
+
+
+def clips():
+    """All real and cloned clips in data/, as (kind, path)."""
+    found = [("echt", p) for p in sorted(state.subdir("real").glob("*.wav"))]
+    found += [("kloon", p) for p in sorted(state.subdir("clones").glob("*.wav"))]
+    return found
+
+
+def degraded(path, version):
+    if version == "origineel":
+        return path
+    dst = state.subdir("degraded") / f"{path.stem}_{version}.wav"
+    if not dst.exists() or dst.stat().st_mtime < path.stat().st_mtime:
+        (audio.mp3 if version == "mp3" else audio.phone_line)(path, dst)
+    return dst
+
+
+@state.requires_consent
+def run(progress=print):
+    import pandas as pd
+    rows = []
+    items = clips()
+    t0 = time.perf_counter()
+    for i, (kind, path) in enumerate(items, 1):
+        progress(f"Clip {i}/{len(items)}: {path.name}")
+        for version in VERSIONS:
+            wav, sr = audio.load_native(degraded(path, version))
+            fs = fake_score(wav, sr)
+            rows.append({
+                "clip": path.stem,
+                "soort": kind,
+                "versie": version,
+                "classifier_nep_score": round(fs, 2),
+                "classifier_oordeel": "nep" if fs >= 0.5 else "echt",
+                "classifier_goed": (fs >= 0.5) == (kind == "kloon"),
+                "watermerk": round(watermark_score(wav, sr), 2),
+            })
+    df = pd.DataFrame(rows)
+    out = state.data_dir() / "detectie.csv"
+    df.to_csv(out, index=False)
+    return df, out, time.perf_counter() - t0
+
+
+def summary(df):
+    """Per kind and version: share the classifier got right and mean watermark score."""
+    return (df.groupby(["soort", "versie"], sort=False)
+              .agg(clips=("clip", "count"),
+                   classifier_goed=("classifier_goed", "mean"),
+                   watermerk_gem=("watermerk", "mean"))
+              .round(2)
+              .reset_index())

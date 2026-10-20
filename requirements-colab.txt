@@ -1,0 +1,17 @@
+# Installed on top of Colab's preinstalled torch, torchaudio and numpy.
+# chatterbox-tts itself is installed from a pinned GitHub commit with --no-deps (see scripts/install_colab.sh),
+# because its own pins would downgrade torch and numpy.
+# Exact versions are frozen after the Wednesday dry run.
+resemble-perth==1.0.1
+s3tokenizer
+conformer==0.3.2
+diffusers==0.29.0
+transformers==5.2.0
+safetensors>=0.5.3
+librosa==0.11.0
+pyloudnorm
+omegaconf
+pyrubberband
+pydub
+# perth imports pkg_resources, which setuptools 81+ removed
+setuptools<81

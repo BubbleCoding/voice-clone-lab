@@ -1,0 +1,14 @@
+# Audio and session data: never commit
+data/
+listening_test/var/
+*.wav
+*.mp3
+*.webm
+*.zip
+
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.DS_Store
+.ipynb_checkpoints/
