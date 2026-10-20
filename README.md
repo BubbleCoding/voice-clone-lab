@@ -26,4 +26,4 @@ Run the session from [`teacher/notes.md`](teacher/notes.md). The student handout
 
 `lab/` is the Python package the notebook imports (record, clone, detect, wipe); `lab/cells.py` holds the Dutch UI for each notebook cell. `listening_test/` is the Flask + SQLite app for the teacher laptop. `scripts/build_notebook.py` generates the notebook, so edit the cells there and run `make notebook`.
 
-Models: [Chatterbox Multilingual V3](https://github.com/resemble-ai/chatterbox) (MIT, Perth watermark) and [mo-thecreator/Deepfake-audio-detection](https://huggingface.co/mo-thecreator/Deepfake-audio-detection) (Apache-2.0).
+Models: [Chatterbox Multilingual V2 (V3 selectable)](https://github.com/resemble-ai/chatterbox) (MIT, Perth watermark) and [mo-thecreator/Deepfake-audio-detection](https://huggingface.co/mo-thecreator/Deepfake-audio-detection) (Apache-2.0).

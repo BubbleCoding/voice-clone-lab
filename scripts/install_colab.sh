@@ -11,7 +11,7 @@ CHATTERBOX="chatterbox-tts @ git+https://github.com/resemble-ai/chatterbox@5de7a
 python - <<'PY' > /tmp/vcl_prefetch.log 2>&1 &
 from huggingface_hub import snapshot_download
 snapshot_download("ResembleAI/chatterbox", allow_patterns=[
-    "ve.pt", "t3_mtl23ls_v3.safetensors", "s3gen.pt", "grapheme_mtl_merged_expanded_v1.json",
+    "ve.pt", "t3_mtl23ls_v2.safetensors", "s3gen.pt", "grapheme_mtl_merged_expanded_v1.json",
     "conds.pt", "Cangjie5_TC.json"])
 snapshot_download("mo-thecreator/Deepfake-audio-detection",
                   allow_patterns=["config.json", "model.safetensors", "preprocessor_config.json"])

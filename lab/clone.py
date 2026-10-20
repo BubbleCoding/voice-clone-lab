@@ -8,7 +8,7 @@ from .state import LabError
 
 MODEL = None
 MODEL_VERSION = None
-VERSION = "v3"  # preferred checkpoint; the setup cell can switch to "v2" for comparison
+VERSION = "v2"  # sounded best for Dutch in the dry run; the setup cell can switch to "v3"
 _conditioned_on = None
 
 # Chatterbox defaults. Free mode lets students (and the dry run) change these.

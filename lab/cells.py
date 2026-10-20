@@ -40,7 +40,7 @@ def _require_colab(what):
 # 1. Setup
 
 @friendly
-def setup(player_mode="proxy", model="v3"):
+def setup(player_mode="proxy", model="v2"):
     player.MODE = player_mode
     clone.VERSION = model
     t0 = time.perf_counter()

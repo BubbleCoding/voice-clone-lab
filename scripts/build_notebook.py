@@ -22,7 +22,7 @@ Voer de cellen van boven naar beneden uit met ▶ of Shift+Enter. Code en uitleg
 
 SETUP = f'''#@title 1. Setup: start deze cel meteen (duurt ongeveer 4 minuten)
 PLAYER = "proxy"  #@param ["proxy", "embed"]
-MODEL = "v3"  #@param ["v3", "v2"]
+MODEL = "v2"  #@param ["v2", "v3"]
 import os
 REPO_URL = "{REPO_URL}"
 REPO_DIR = "/content/voice-clone-lab"
