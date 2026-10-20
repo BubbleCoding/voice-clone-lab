@@ -88,6 +88,16 @@ Discussievragen (slide 9):
 | Classifier laadt niet | Ga door met alleen het watermerk en het eigen oor. |
 | Klaswifi blokkeert de luistertest | Telefoonhotspot. Of speel clips af op de beamer en laat de klas met handopsteken stemmen. |
 
+## De code is zichtbaar en aanpasbaar
+
+De kern van het klonen (stap 4 en 5) en de detectie (stap 7) staat als leesbare Python in het notebook. De rest zit in `lab/`, te openen via het 📁-icoon links; wijzigingen daar werken bij de volgende cel (autoreload). Ideeën om studenten te laten proberen:
+- In stap 4 `REF_LENGTHS = [1, 2, 3]`: hoe weinig stem is genoeg? (Doe dit ná het downloaden in stap 6, want de luistertest verwacht 3, 6 en 10 s.)
+- In stap 5 de schuifjes: wat doet CFG met het accent, wat doet temperatuur met de stabiliteit?
+- In `audio.py` het telefoonfilter strenger of milder maken (`phone_line`): bij welke instelling overleeft het watermerk?
+- In `texts.py` het scamfilter bekijken: hoe makkelijk is het te omzeilen?
+
+Gaat er iets stuk door een aanpassing: *Runtime → Sessie opnieuw starten* en cel 1 opnieuw draaien. Opnames blijven bewaard. De originele code terughalen kan met een nieuwe cel `!git -C /content/voice-clone-lab checkout -- .`
+
 ## Wat de tools wel en niet afdwingen
 
-De stappen weigeren te werken zonder toestemming, klonen kan alleen met een referentie die live in stap 3 is opgenomen (gecontroleerd met een hash), en de vrije modus weigert scamachtige tekst. Studenten kunnen in Colab wel zelf Python schrijven en die regels dus omzeilen. Het zijn vangrails, geen sloten. Benoem dat gerust: het is precies het punt van de les.
+De stappen weigeren te werken zonder toestemming, klonen kan alleen met een referentie die live in stap 3 is opgenomen (gecontroleerd met een hash), en de vrije modus weigert scamachtige tekst. Maar studenten zien en bewerken de code, dus ze kunnen die controles ook weghalen; het notebook zegt dat ook eerlijk. Het zijn vangrails, geen sloten. Gebruik dat in de discussie: als een student met één regel het scamfilter uitzet, wat betekent dat voor "veilige" open modellen?

@@ -1,18 +1,18 @@
-"""Voice cloning with Chatterbox Multilingual. References come only from live recordings."""
+"""Voice cloning with Chatterbox Multilingual: building blocks the notebook's step 4 and 5 use.
 
-import time
+References come only from live recordings: condition() refuses anything else.
+"""
+
 from pathlib import Path
 
 from . import audio, state, texts
 from .state import LabError
 
-MODEL = None
-MODEL_VERSION = None
-VERSION = "v2"  # sounded best for Dutch in the dry run; the setup cell can switch to "v3"
-_conditioned_on = None
-
-# Chatterbox defaults. Free mode lets students (and the dry run) change these.
-GENERATION_DEFAULTS = {"exaggeration": 0.5, "cfg_weight": 0.5, "temperature": 0.8}
+# globals().get keeps the loaded model when autoreload re-runs this file after an edit.
+MODEL = globals().get("MODEL")
+MODEL_VERSION = globals().get("MODEL_VERSION")
+VERSION = globals().get("VERSION", "v2")  # sounded best for Dutch in the dry run; setup can switch to "v3"
+_conditioned_on = globals().get("_conditioned_on")
 
 
 def device():
@@ -41,6 +41,12 @@ def load_model(dev=None):
     return MODEL
 
 
+def require_model():
+    if MODEL is None:
+        raise LabError("Het model is niet geladen. Voer eerst de setupcel (stap 1) uit.")
+    return MODEL
+
+
 def unload():
     global MODEL, MODEL_VERSION, _conditioned_on
     MODEL = None
@@ -52,64 +58,57 @@ def reference_path(seconds):
     return state.subdir("ref") / f"ref_{seconds}s.wav"
 
 
-def clone_path(sentence_id, seconds):
-    return state.subdir("clones") / f"{sentence_id}_{seconds}s.wav"
+def clone_path(name, seconds):
+    return state.subdir("clones") / f"{name}_{seconds}s.wav"
 
 
 @state.requires_consent
-def make_references():
-    """Cut the live reading recording into 3, 6 and 10 s of mostly speech, with natural rhythm."""
-    src = state.verified_recording("reference")
-    speech = audio.compress_pauses(audio.load(src))
-    if audio.duration(speech) < max(texts.REF_LENGTHS):
-        raise LabError(f"Te weinig spraak in je opname ({audio.duration(speech):.1f} s). Neem de leestekst opnieuw op.")
-    paths = {}
-    for seconds in texts.REF_LENGTHS:
-        path = audio.save(reference_path(seconds), audio.normalize_loudness(audio.cut(speech, seconds, fade_s=0.02)))
-        state.register_derived(path)
-        paths[seconds] = path
-    return paths
+def load_reference_speech():
+    """Your live reading recording from step 3a, with long pauses shortened."""
+    return audio.compress_pauses(audio.load(state.verified_recording("reference")))
 
 
-def _condition(ref):
+@state.requires_consent
+def save_reference(speech, seconds):
+    """Save the first `seconds` of speech as a reference clip and mark it as your own voice."""
+    if audio.duration(speech) < seconds:
+        raise LabError(f"Je opname bevat maar {audio.duration(speech):.1f} s spraak; neem de leestekst opnieuw op.")
+    path = audio.save(reference_path(seconds), audio.normalize_loudness(audio.cut(speech, seconds, fade_s=0.02)))
+    state.register_derived(path)
+    return path
+
+
+@state.requires_consent
+def condition(ref):
+    """Let the model 'listen' to a reference (model.prepare_conditionals), after checking it is your own voice."""
     global _conditioned_on
+    model = require_model()
     ref = Path(ref)
     if not ref.exists() or not state.is_verified(ref):
         # Own voice only: anything not cut from a live recording is refused.
         raise LabError("Klonen kan alleen met je eigen live opname uit stap 3.")
-    if _conditioned_on != (ref, ref.stat().st_mtime_ns):
-        MODEL.prepare_conditionals(str(ref), exaggeration=0.5)
-        _conditioned_on = (ref, ref.stat().st_mtime_ns)
+    key = (ref, ref.stat().st_mtime_ns)
+    if _conditioned_on != key:
+        model.prepare_conditionals(str(ref))
+        _conditioned_on = key
 
 
-def _generate(text, lang, ref, dst, **settings):
-    if MODEL is None:
-        raise LabError("Het model is niet geladen. Voer eerst de setupcel (stap 1) uit.")
-    _condition(ref)
-    params = {**GENERATION_DEFAULTS, **settings}
-    t0 = time.perf_counter()
-    wav = MODEL.generate(text, language_id=lang, **params).squeeze(0).cpu().numpy()
-    elapsed = time.perf_counter() - t0
-    audio.save(dst, wav, MODEL.sr)
-    return {"audio_s": round(len(wav) / MODEL.sr, 1), "gen_s": round(elapsed, 1)}
+def to_numpy(wav):
+    """Chatterbox returns a (1, samples) tensor; we store plain mono arrays."""
+    return wav.squeeze(0).cpu().numpy() if hasattr(wav, "cpu") else wav
 
 
-@state.requires_consent
-def run_experiment(progress=print):
-    refs = make_references()
-    results = []
-    for seconds in texts.REF_LENGTHS:
-        for s in texts.SENTENCES:
-            progress(f"Bezig: {s['id']} met {seconds} s referentie...")
-            dst = clone_path(s["id"], seconds)
-            timing = _generate(s["text"], s["lang"], refs[seconds], dst)
-            results.append({"zin": s["id"], "referentie_s": seconds, **timing,
-                            "realtime_factor": round(timing["gen_s"] / max(timing["audio_s"], 0.1), 2),
-                            "path": dst})
-    return results
+def save_clone(wav, name, seconds):
+    return audio.save(clone_path(name, seconds), to_numpy(wav), require_model().sr)
+
+
+def save_free(wav, seconds):
+    n = len(list(state.subdir("clones").glob("vrij_*.wav"))) + 1
+    return save_clone(wav, f"vrij_{n:02d}", seconds)
 
 
 def check_free_text(text):
+    """The free-mode scam filter. Students can see (and could remove) it: that is a discussion point."""
     text = (text or "").strip()
     if not text:
         raise LabError("Typ eerst een zin.")
@@ -119,19 +118,3 @@ def check_free_text(text):
     if hits:
         raise LabError("Deze tekst lijkt op een oplichtingsbericht (" + ", ".join(hits) + ") en wordt niet gegenereerd.")
     return text
-
-
-@state.requires_consent
-def generate_free(text, lang="nl", seconds=10, **settings):
-    text = check_free_text(text)
-    if lang not in ("nl", "en"):
-        raise LabError("Kies Nederlands of Engels.")
-    if seconds not in texts.REF_LENGTHS:
-        raise LabError("Kies 3, 6 of 10 seconden.")
-    ref = reference_path(seconds)
-    if not ref.exists():
-        make_references()
-    n = len(list(state.subdir("clones").glob("vrij_*.wav"))) + 1
-    dst = state.subdir("clones") / f"vrij_{n:02d}_{seconds}s.wav"
-    timing = _generate(text, lang, ref, dst, **settings)
-    return {"path": dst, **timing}

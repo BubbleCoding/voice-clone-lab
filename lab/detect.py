@@ -1,14 +1,13 @@
 """Detection: a deepfake classifier and the Perth watermark, before and after degradation."""
 
-import time
-
 import numpy as np
 
 from . import audio, state
 
 CLASSIFIER_ID = "mo-thecreator/Deepfake-audio-detection"
-CLASSIFIER = None
-WATERMARKER = None
+# globals().get keeps loaded models when autoreload re-runs this file after an edit.
+CLASSIFIER = globals().get("CLASSIFIER")
+WATERMARKER = globals().get("WATERMARKER")
 
 VERSIONS = ("origineel", "mp3", "telefoon")
 
@@ -48,12 +47,14 @@ def watermark_score(wav, sr):
 
 
 def fake_score(wav, sr):
+    """Classifier's probability (0-1) that the clip is fake. The model expects 16 kHz."""
     import librosa
     wav16 = librosa.resample(wav, orig_sr=sr, target_sr=16000) if sr != 16000 else wav
     scores = load_classifier()({"raw": wav16, "sampling_rate": 16000}, top_k=None)
     return float(next(s["score"] for s in scores if s["label"].lower() == "fake"))
 
 
+@state.requires_consent
 def clips():
     """All real and cloned clips in data/, as (kind, path)."""
     found = [("echt", p) for p in sorted(state.subdir("real").glob("*.wav"))]
@@ -62,38 +63,12 @@ def clips():
 
 
 def degraded(path, version):
+    """The clip as-is, after MP3 compression, or after a phone line (filters in audio.py)."""
     if version == "origineel":
         return path
     dst = state.subdir("degraded") / f"{path.stem}_{version}.wav"
-    if not dst.exists() or dst.stat().st_mtime < path.stat().st_mtime:
-        (audio.mp3 if version == "mp3" else audio.phone_line)(path, dst)
-    return dst
-
-
-@state.requires_consent
-def run(progress=print):
-    import pandas as pd
-    rows = []
-    items = clips()
-    t0 = time.perf_counter()
-    for i, (kind, path) in enumerate(items, 1):
-        progress(f"Clip {i}/{len(items)}: {path.name}")
-        for version in VERSIONS:
-            wav, sr = audio.load_native(degraded(path, version))
-            fs = fake_score(wav, sr)
-            rows.append({
-                "clip": path.stem,
-                "soort": kind,
-                "versie": version,
-                "classifier_nep_score": round(fs, 2),
-                "classifier_oordeel": "nep" if fs >= 0.5 else "echt",
-                "classifier_goed": (fs >= 0.5) == (kind == "kloon"),
-                "watermerk": round(watermark_score(wav, sr), 2),
-            })
-    df = pd.DataFrame(rows)
-    out = state.data_dir() / "detectie.csv"
-    df.to_csv(out, index=False)
-    return df, out, time.perf_counter() - t0
+    # Always re-run the filter, so edits to audio.mp3 / audio.phone_line take effect.
+    return (audio.mp3 if version == "mp3" else audio.phone_line)(path, dst)
 
 
 def summary(df):

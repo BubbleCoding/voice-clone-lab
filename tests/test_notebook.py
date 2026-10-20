@@ -1,7 +1,6 @@
 """Static guardrail checks on the notebook and package source."""
 
 import json
-import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -17,9 +16,19 @@ def test_notebook_requests_t4_gpu_and_has_no_outputs():
 
 
 def test_cell_order_matches_lesson():
-    calls = [re.findall(r"lab\.(\w+)\(", src)[-1] for src in CODE]
-    assert calls == ["setup", "consent", "record_reference", "record_target", "experiment",
-                     "free_mode", "download", "detection", "wipe"]
+    markers = ["ui.setup(", "ui.consent()", "ui.record_reference()", "ui.record_target()", "model.generate(",
+               "TEXT = ", "ui.download()", "detect.fake_score(", "ui.wipe()"]
+    assert len(CODE) == len(markers)
+    for src, marker in zip(CODE, markers):
+        assert marker in src, marker
+
+
+def test_core_code_is_visible():
+    visible = [src for src, c in zip(CODE, [c for c in NB["cells"] if c["cell_type"] == "code"])
+               if c["metadata"].get("cellView") != "form"]
+    joined = "\n".join(visible)
+    for needle in ("model.generate(", "clone.condition(", "detect.watermark_score(", "detect.fake_score("):
+        assert needle in joined, needle
 
 
 def test_no_public_links_drive_or_reference_upload():

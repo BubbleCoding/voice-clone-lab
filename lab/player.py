@@ -14,10 +14,11 @@ from pathlib import Path
 
 from . import colab_io, state
 
-MODE = "proxy"  # "proxy" or "embed"
+MODE = globals().get("MODE", "proxy")  # "proxy" or "embed"
 
-_server = None
-_base_url = None
+# globals().get keeps the running server when autoreload re-runs this file after an edit.
+_server = globals().get("_server")
+_base_url = globals().get("_base_url")
 
 
 class _QuietHandler(http.server.SimpleHTTPRequestHandler):

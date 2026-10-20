@@ -1,10 +1,10 @@
-"""The functions the notebook cells call, with a Dutch UI. All logic lives in the other modules."""
+"""Dutch UI for the notebook's plumbing cells (setup, consent, recording, download, wipe) and result displays."""
 
 import functools
 import html
 import time
 
-from . import audio, checks, clone, colab_io, detect, package, player, state, texts, wipe as wipe_mod
+from . import audio, checks, clone, colab_io, package, player, state, texts, wipe as wipe_mod
 from .state import LabError
 
 
@@ -32,6 +32,17 @@ def friendly(func):
     return wrapper
 
 
+def _install_error_handler():
+    """In the visible code cells, show a LabError as one Dutch line instead of a traceback."""
+    try:
+        from IPython import get_ipython
+    except ImportError:
+        return
+    ip = get_ipython()
+    if ip is not None:
+        ip.set_custom_exc((LabError,), lambda shell, etype, value, tb, tb_offset=None: _error(str(value)))
+
+
 def _require_colab(what):
     if not colab_io.in_colab():
         raise LabError(f"{what} werkt alleen in Google Colab.")
@@ -41,6 +52,7 @@ def _require_colab(what):
 
 @friendly
 def setup(player_mode="proxy", model="v2"):
+    _install_error_handler()
     player.MODE = player_mode
     clone.VERSION = model
     t0 = time.perf_counter()
@@ -131,68 +143,31 @@ def record_target():
     player.show(path)
 
 
-# 4. Experiment
+# 4. Experiment (the loop itself is visible code in the notebook)
 
-@friendly
-def experiment():
+def show_experiment(results):
+    """Player grid (real vs clones per sentence) and a timing table for the step-4 results."""
     import pandas as pd
     from IPython.display import display
-    t0 = time.perf_counter()
-    results = clone.run_experiment()
-    total = time.perf_counter() - t0
+    lengths = sorted({r["referentie_s"] for r in results})
     real_target = state.subdir("real") / f"{texts.TARGET_ID}_echt.wav"
-    header = ["Zin", "Echt"] + [f"Kloon {s} s" for s in texts.REF_LENGTHS]
+    header = ["Zin", "Echt"] + [f"Kloon {n} s" for n in lengths]
     rows = []
     for s in texts.SENTENCES:
         real = real_target if s["id"] == texts.TARGET_ID and real_target.exists() else None
-        rows.append((f"{s['id']}: {s['text']}", [real] + [clone.clone_path(s["id"], n) for n in texts.REF_LENGTHS]))
+        paths = [clone.clone_path(s["id"], n) for n in lengths]
+        rows.append((f"{s['id']}: {s['text']}", [real] + [p if p.exists() else None for p in paths]))
     player.show_grid(header, rows)
-    table = pd.DataFrame([{k: v for k, v in r.items() if k != "path"} for r in results])
-    table.columns = ["Zin", "Referentie (s)", "Audio (s)", "Generatietijd (s)", "Realtime-factor"]
+    table = pd.DataFrame([{
+        "Zin": r["zin"],
+        "Referentie (s)": r["referentie_s"],
+        "Audio (s)": round(audio.duration(audio.load(r["path"])), 1),
+        "Generatietijd (s)": round(r["generatietijd_s"], 1),
+    } for r in results])
+    table["Realtime-factor"] = (table["Generatietijd (s)"] / table["Audio (s)"]).round(2)
     display(table)
-    _ok(f"{len(results)} klonen gemaakt in {total:.0f} s. Zoveel moeite kost het dus.")
-
-
-# 5. Free mode
-
-@friendly
-@state.requires_consent
-def free_mode():
-    import ipywidgets as w
-    from IPython.display import display
-    _show_html(f"<p style='color:#b00020'><b>{html.escape(texts.FREE_MODE_NOTICE)}</b></p>")
-    text = w.Textarea(placeholder="Typ een zin...", layout=w.Layout(width="520px", height="70px"))
-    lang = w.Dropdown(options=[("Nederlands", "nl"), ("Engels", "en")], description="Taal:")
-    seconds = w.Dropdown(options=[(f"{s} s", s) for s in texts.REF_LENGTHS], value=max(texts.REF_LENGTHS),
-                         description="Referentie:")
-    d = clone.GENERATION_DEFAULTS
-    style = {"description_width": "110px"}
-    exaggeration = w.FloatSlider(value=d["exaggeration"], min=0.25, max=1.5, step=0.05, description="Expressie:", style=style)
-    cfg_weight = w.FloatSlider(value=d["cfg_weight"], min=0.0, max=1.0, step=0.05, description="CFG / tempo:", style=style)
-    temperature = w.FloatSlider(value=d["temperature"], min=0.4, max=1.2, step=0.05, description="Temperatuur:", style=style)
-    advanced = w.Accordion(children=[w.VBox([
-        w.HTML("<small>Lagere CFG = rustiger tempo en minder accent van de referentie. "
-               "Hogere expressie = dramatischer. Lagere temperatuur = stabieler.</small>"),
-        exaggeration, cfg_weight, temperature])])
-    advanced.set_title(0, "Geavanceerd")
-    button = w.Button(description="Genereer", button_style="primary")
-    out = w.Output()
-
-    def on_click(_):
-        out.clear_output()
-        with out:
-            try:
-                button.disabled = True
-                result = clone.generate_free(text.value, lang.value, seconds.value, exaggeration=exaggeration.value,
-                                             cfg_weight=cfg_weight.value, temperature=temperature.value)
-                player.show(result["path"], f"{result['audio_s']} s audio in {result['gen_s']} s gegenereerd")
-            except LabError as e:
-                _error(str(e))
-            finally:
-                button.disabled = False
-
-    button.on_click(on_click)
-    display(w.VBox([text, w.HBox([lang, seconds]), advanced, button, out]))
+    total = sum(r["generatietijd_s"] for r in results)
+    _ok(f"{len(results)} klonen gemaakt in {total:.0f} s rekentijd.")
 
 
 # 6. Download
@@ -203,20 +178,6 @@ def download(all_clips=False):
     _ok(f"{zip_path.name} gemaakt. Upload dit bestand straks in de luistertest.")
     if colab_io.in_colab():
         colab_io.download(zip_path)
-
-
-# 7. Detection
-
-@friendly
-def detection():
-    from IPython.display import display
-    df, csv_path, elapsed = detect.run()
-    if df.empty:
-        raise LabError("Geen clips gevonden. Voer eerst stap 3 en 4 uit.")
-    display(df)
-    print("\nSamenvatting (classifier_goed = aandeel juist beoordeeld):")
-    display(detect.summary(df))
-    _ok(f"{df['clip'].nunique()} clips × 3 versies getest in {elapsed:.0f} s. Tabel opgeslagen als {csv_path.name}.")
 
 
 # 8. Wipe

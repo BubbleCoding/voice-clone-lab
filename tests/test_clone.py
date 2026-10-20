@@ -1,58 +1,50 @@
-import shutil
-
 import pytest
 
-from lab import clone, state, texts
+from lab import audio, clone, state
 from lab.state import LabError
 
 
-def test_experiment_makes_every_sentence_at_every_length(recordings, fake_model):
-    results = clone.run_experiment(progress=lambda _: None)
-    assert len(results) == len(texts.SENTENCES) * len(texts.REF_LENGTHS)
-    for s in texts.SENTENCES:
-        for n in texts.REF_LENGTHS:
-            assert clone.clone_path(s["id"], n).exists()
-    # Conditioned once per reference length, not once per sentence.
-    assert len(fake_model.conditioned) == len(texts.REF_LENGTHS)
-    assert all(r["gen_s"] >= 0 and r["audio_s"] > 0 for r in results)
-
-
 def test_reference_lengths_are_exact(recordings):
-    from lab import audio
-    paths = clone.make_references()
-    for n, path in paths.items():
-        assert audio.duration(audio.load(path)) == pytest.approx(n, abs=0.01)
+    speech = clone.load_reference_speech()
+    for n in (3, 6, 10):
+        assert audio.duration(audio.load(clone.save_reference(speech, n))) == pytest.approx(n, abs=0.01)
 
 
-def test_experiment_needs_consent(fake_model):
+def test_reference_needs_consent():
     with pytest.raises(LabError):
-        clone.run_experiment()
+        clone.load_reference_speech()
 
 
-def test_uploaded_reference_is_refused(recordings, fake_model, tmp_path):
-    clone.make_references()
-    # Replace the 10 s reference with someone else's audio: cloning must refuse it.
-    other = tmp_path / "celebrity.wav"
-    shutil.copy(state.subdir("real") / "NL1_echt.wav", other)
-    from lab import audio
-    audio.save(clone.reference_path(10), audio.load(other)[: 10 * audio.SR] * 0.5)
+def test_condition_requires_model(recordings):
+    ref = clone.save_reference(clone.load_reference_speech(), 3)
     with pytest.raises(LabError):
-        clone.generate_free("Hallo, dit is een test.", "nl", 10)
+        clone.condition(ref)
+
+
+def test_condition_refuses_audio_that_is_not_a_live_recording(recordings, fake_model, tmp_path):
+    # Someone else's voice saved as a reference: cloning must refuse it.
+    other = audio.save(tmp_path / "celebrity.wav", audio.load(state.subdir("real") / "NL1_echt.wav") * 0.5)
+    with pytest.raises(LabError):
+        clone.condition(other)
+    audio.save(clone.reference_path(10), audio.load(other))
+    with pytest.raises(LabError):
+        clone.condition(clone.reference_path(10))
+
+
+def test_condition_once_per_reference(recordings, fake_model):
+    ref = clone.save_reference(clone.load_reference_speech(), 6)
+    clone.condition(ref)
+    clone.condition(ref)
+    assert fake_model.conditioned == [str(ref)]
 
 
 @pytest.mark.parametrize("text", ["Mam, kun je snel geld overmaken?", "Send me the gift card code", "x" * 201, "  "])
-def test_free_mode_refuses(text, recordings, fake_model):
+def test_scam_filter_refuses(text):
     with pytest.raises(LabError):
-        clone.generate_free(text, "nl", 10)
+        clone.check_free_text(text)
 
 
-def test_free_mode_generates(recordings, fake_model):
-    result = clone.generate_free("Het regent vandaag in Amsterdam.", "nl", 6)
-    assert result["path"].exists() and result["path"].name.startswith("vrij_")
-    assert fake_model.settings == clone.GENERATION_DEFAULTS
-
-
-def test_free_mode_passes_settings(recordings, fake_model):
-    clone.generate_free("Het regent vandaag in Amsterdam.", "nl", 10, cfg_weight=0.2, temperature=0.6)
-    assert fake_model.settings["cfg_weight"] == 0.2 and fake_model.settings["temperature"] == 0.6
-    assert fake_model.settings["exaggeration"] == clone.GENERATION_DEFAULTS["exaggeration"]
+def test_save_free_numbers_clips(recordings, fake_model):
+    wav = fake_model.generate("Hallo", "nl")
+    assert clone.save_free(wav, 10).name == "vrij_01_10s.wav"
+    assert clone.save_free(wav, 6).name == "vrij_02_6s.wav"

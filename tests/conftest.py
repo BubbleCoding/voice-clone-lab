@@ -1,3 +1,4 @@
+import json
 import sys
 from pathlib import Path
 
@@ -81,3 +82,35 @@ def fake_model(monkeypatch):
     monkeypatch.setattr(clone, "MODEL", model)
     monkeypatch.setattr(clone, "MODEL_VERSION", "fake")
     return model
+
+
+NOTEBOOK = Path(__file__).resolve().parent.parent / "voice_clone_lab.ipynb"
+
+
+def notebook_cell(marker):
+    """Source of the notebook code cell that contains marker."""
+    cells = json.loads(NOTEBOOK.read_text())["cells"]
+    matches = ["".join(c["source"]) for c in cells if c["cell_type"] == "code" and marker in "".join(c["source"])]
+    assert len(matches) == 1, marker
+    return matches[0]
+
+
+def run_cell(marker, replace=None):
+    """Execute a notebook code cell with the names the setup cell imports."""
+    import time
+    import pandas as pd
+    from IPython.display import display
+    from lab import audio, clone, detect, player, state, texts
+    from lab import cells as ui
+    source = notebook_cell(marker)
+    for old, new in (replace or {}).items():
+        assert old in source, old
+        source = source.replace(old, new)
+    namespace = {"time": time, "pd": pd, "display": display, "audio": audio, "clone": clone, "detect": detect,
+                 "player": player, "state": state, "texts": texts, "ui": ui}
+    exec(compile(source, f"<notebook: {marker}>", "exec"), namespace)
+    return namespace
+
+
+def run_experiment():
+    return run_cell("REF_LENGTHS = [3, 6, 10]")["results"]

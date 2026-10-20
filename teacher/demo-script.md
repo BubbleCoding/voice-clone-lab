@@ -9,7 +9,7 @@ Doel: in de eerste minuten laat je de klas een kloon van jouw stem horen zonder 
    - "Goedemorgen allemaal. Ik sta nog even in de file, dus begin vast met het openen van de link op het scherm. Ik ben er over vijf minuten."
    - "Hoi, met mij. Ik heb de slides van vandaag net nog aangepast, dus kijk even goed naar de nieuwe versie."
    Genereer een paar keer en kies de overtuigendste.
-3. Voeg onder stap 6 een eigen cel toe met `lab.download(all_clips=True)` en draai die. Je krijgt `alle_clips.zip` met al je echte en gekloonde clips.
+3. Voeg onder stap 6 een eigen cel toe met `ui.download(all_clips=True)` en draai die. Je krijgt `alle_clips.zip` met al je echte en gekloonde clips.
 4. Draai ook stap 6 zelf: die zip (`CODE-A.zip`) is de **demoset** voor studenten die niet willen opnemen. Upload hem tijdens de les met je docentkaart in de luistertest.
 5. Pak `alle_clips.zip` uit. Zet het gekozen vrije-modusbestand (`clones/vrij_...wav`) als audio in je slides, op slide 2, zonder titel.
 6. Draai stap 8 (wissen). Je demobestanden staan nu alleen nog op je eigen laptop.

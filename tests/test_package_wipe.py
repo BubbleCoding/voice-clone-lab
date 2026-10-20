@@ -3,6 +3,7 @@ import zipfile
 import pytest
 import soundfile as sf
 
+from conftest import run_experiment
 from lab import clone, package, state, wipe
 from lab.state import LabError
 
@@ -10,7 +11,7 @@ from lab.state import LabError
 def test_zip_has_real_and_three_clones_at_24k(recordings, fake_model):
     with pytest.raises(LabError):
         package.make_zip()  # no clones yet
-    clone.run_experiment(progress=lambda _: None)
+    run_experiment()
     path = package.make_zip()
     assert path.name == "K7QM-A.zip"
     with zipfile.ZipFile(path) as zf:
@@ -21,7 +22,7 @@ def test_zip_has_real_and_three_clones_at_24k(recordings, fake_model):
 
 
 def test_wipe_removes_all_audio(recordings, fake_model, data_dir):
-    clone.run_experiment(progress=lambda _: None)
+    run_experiment()
     package.make_zip()
     assert any(data_dir.rglob("*.wav"))
     wipe.wipe_data()
