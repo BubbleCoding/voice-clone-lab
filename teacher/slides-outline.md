@@ -1,4 +1,4 @@
-Make a PowerPoint deck (.pptx) for a 150-minute workshop for second-year HBO-ICT students (HvA) called **"Jouw stem, hun scam"**. Students clone their own voice with an open-source AI model in Google Colab, test whether their partner can tell real from fake, try to detect the fakes, and discuss the dark side of voice cloning. All slide text is in **Dutch**; keep it exactly as given below.
+Make a PowerPoint deck (.pptx) for a 150-minute workshop for second-year ICT students (HvA) called **"Jouw stem, hun scam"**. Students clone their own voice with an open-source AI model in Google Colab, test whether their partner can tell real from fake, try to detect the fakes, and discuss the dark side of voice cloning. All slide text is in **Dutch**; keep it exactly as given below.
 
 **Theme: Dark Tech**
 - Pure black background (#000000) on every slide, white text (#FFFFFF), no other colours.

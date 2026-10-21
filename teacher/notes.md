@@ -1,6 +1,6 @@
 # Docentnotities: Jouw stem, hun scam (150 min)
 
-Tweedejaars HBO-ICT, blok "De schaduwkant van technologie". Studenten werken in paren, ieder op een eigen laptop, met hun eigen stem. Al het rekenwerk draait in Google Colab; je hebt zelf alleen de beamer en je slides nodig.
+Tweedejaars ICT, blok "De schaduwkant van technologie". Studenten werken in paren, ieder op een eigen laptop, met hun eigen stem. Al het rekenwerk draait in Google Colab; je hebt zelf alleen de beamer en je slides nodig.
 
 **Doel van de les:** studenten ervaren hoe makkelijk het is om een stem te klonen, en praten over de schaduwkant: oplichting, wie verantwoordelijk is, en wat wel en niet beschermt. Het notebook is het middel; de gesprekken zijn de kern. Daarom zitten er vier gespreksmomenten (G1 tot en met G4) door de les heen.
 

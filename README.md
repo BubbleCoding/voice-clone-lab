@@ -1,6 +1,6 @@
 # Jouw stem, hun scam: voice-clone lab
 
-Workshop kit for HBO-ICT (HvA): students clone their own voice, test whether their partner can tell real from fake, try to detect the fakes, and discuss the dark side of voice cloning.
+Workshop kit for ICT (HvA): students clone their own voice, test whether their partner can tell real from fake, try to detect the fakes, and discuss the dark side of voice cloning.
 
 ## Studenten
 
