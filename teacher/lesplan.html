@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesplan Jouw stem</title>
+<style>
+  :root {
+    --ink: #000;
+    --muted: #555;
+    --line: #bbb;
+    --sans: "Inter", "Helvetica Neue", Arial, sans-serif;
+    --mono: "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  @page { size: A4; margin: 0; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { margin: 0; background: #e5e5e5; color: var(--ink); font: 9.2pt/1.35 var(--sans); }
+
+  .toolbar { text-align: center; padding: 16px; font-size: 14px; }
+  .toolbar button { font: 600 14px var(--sans); padding: 10px 20px; border: 0; border-radius: 6px; background: #000; color: #fff; cursor: pointer; }
+  .toolbar p { margin: 8px 0 0; color: var(--muted); }
+
+  .page { width: 210mm; height: 297mm; margin: 0 auto 16px; padding: 0 12mm 10mm; background: #fff;
+          display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,.15); }
+
+  .band { background: #000; color: #fff; margin: 0 -12mm 5mm; padding: 6mm 12mm 5mm; display: flex; justify-content: space-between; align-items: flex-end; }
+  .band h1 { margin: 0; font-size: 20pt; font-weight: 900; letter-spacing: -0.01em; line-height: 1; text-transform: uppercase; }
+  .band p { margin: 0; font: 8.5pt var(--mono); color: #ccc; letter-spacing: 0.04em; text-align: right; }
+
+  h2 { font-size: 9.5pt; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 1.5mm; }
+
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font-size: 7.5pt; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted);
+       border-bottom: 2px solid var(--ink); padding: 0 2mm 1mm 0; }
+  td { vertical-align: top; padding: 1.3mm 2mm 1.3mm 0; border-bottom: 1px solid var(--line); }
+  td.time { font: 700 9.5pt var(--mono); width: 11mm; }
+  td.slide { font: 8.5pt var(--mono); color: var(--muted); width: 12mm; white-space: nowrap; }
+  td.block { font-weight: 800; width: 31mm; }
+  td.block .step { display: inline-block; margin-top: 1mm; }
+  td.check { width: 6mm; padding-right: 0; }
+  td.check span { display: block; width: 4mm; height: 4mm; border: 1.5px solid var(--ink); margin-top: 0.3mm; }
+  .step { font: 600 8pt var(--mono); background: #000; color: #fff; padding: 0.2mm 1.3mm; border-radius: 2px; white-space: nowrap; }
+  .g { font: 700 8pt var(--mono); border: 1.5px solid var(--ink); padding: 0 1.2mm; margin-right: 1mm; white-space: nowrap; }
+  .say { font-style: italic; }
+  .to { color: var(--muted); }
+  td p { margin: 0 0 0.5mm; }
+  code { font: 8pt var(--mono); }
+  td p:last-child { margin: 0; }
+  tr.pause td { color: var(--muted); }
+
+  .bottom { margin-top: auto; align-items: start; display: grid; grid-template-columns: 1fr 1.35fr; gap: 5mm; padding-top: 4mm; }
+  .box { border: 2px solid var(--ink); padding: 3mm 4mm; }
+  .box ul { margin: 0; padding: 0; list-style: none; }
+  .box li { margin: 0.8mm 0; padding-left: 5.5mm; position: relative; }
+  .box.prep li::before { content: ""; position: absolute; left: 0; top: 0.5mm; width: 3mm; height: 3mm; border: 1.3px solid var(--ink); }
+  .box.fix li { padding-left: 0; display: grid; grid-template-columns: 24mm 1fr; }
+
+
+  @media print {
+    body { background: #fff; }
+    .toolbar { display: none; }
+    .page { margin: 0; box-shadow: none; }
+  }
+  @media screen and (max-width: 820px) {
+    .page { width: 100%; height: auto; padding: 0 16px 16px; }
+    .band { margin: 0 -16px 16px; padding: 16px; flex-direction: column; align-items: flex-start; gap: 6px; }
+    .band p { text-align: left; }
+    td.slide, th.slide { display: none; }
+    .bottom { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <button onclick="window.print()">Afdrukken</button>
+  <p>A4, enkelzijdig, schaal 100%, "Achtergrondafbeeldingen" aan.</p>
+</div>
+
+<section class="page">
+  <header class="band">
+    <h1>Lesplan · Jouw stem, hun scam</h1>
+    <p>150 MIN · ICT · DO 22 OKT 2026<br>uitgebreid: teacher/notes.md</p>
+  </header>
+
+  <table>
+    <thead><tr><th>Tijd</th><th class="slide">Slide</th><th>Blok</th><th>Wat je doet en zegt</th><th></th></tr></thead>
+    <tbody>
+      <tr><td class="time">0:00</td><td class="slide">1</td><td class="block">Start<br><span class="step">cel 1</span></td>
+        <td><span class="say">"Open de link op het scherm en start meteen cel 1."</span> Die duurt ±4 min.</td><td class="check"><span></span></td></tr>
+      <tr><td class="time">0:02</td><td class="slide">2–4</td><td class="block">Hook</td>
+        <td><p>Speel de voicemail af, zonder iets over AI. Ga een paar seconden gewoon door.</p>
+          <p>Onthulling: <span class="say">"Dit heb ik nooit gezegd."</span> 10 seconden · 1 minuut · €0. <span class="say">"Wie had het door?"</span> Handen tellen.</p></td><td class="check"><span></span></td></tr>
+      <tr><td class="time">0:06</td><td class="slide">5–7</td><td class="block">Nieuws</td>
+        <td><p>INTERPOL-campagne (18 okt) · Britse AI-scam-watchlist (19 okt) · Californische moeder, $5.400, nep-ontvoering met de stem van haar dochter (7 okt).</p>
+          <p class="to">0:13 Kijk rond: draait cel 1 overal?</p></td><td class="check"><span></span></td></tr>
+      <tr><td class="time">0:15</td><td class="slide">8–9</td><td class="block">Toestemming<br><span class="step">stap 2</span></td>
+        <td><p>Vier vinkjes. Eigen stem, niets delen, alles wordt gewist, niet meedoen mag. Opt-out = luisteraar bij de partner.</p>
+          <p class="to">Loop rond: "✅ Alles werkt"? Geen GPU → T4 kiezen, anders samen op één laptop.</p></td><td class="check"><span></span></td></tr>
+      <tr><td class="time">0:20</td><td class="slide">10</td><td class="block">Opnemen + klonen<br><span class="step">3a</span> <span class="step">3b</span> <span class="step">4</span></td>
+        <td><p>Stille hoek, laptop dichtbij, normaal tempo. De testzin (3b) wordt de echte clip in de quiz.</p>
+          <p><span class="g">G1</span>Tijdens het rekenen: <span class="say">"Hoeveel clips van 10 seconden van jou staan er online?"</span> Laat ze echt tellen. <span class="to">→ Je stem is geen geheim meer.</span></p></td><td class="check"><span></span></td></tr>
+      <tr><td class="time">0:45</td><td class="slide">11–12</td><td class="block">Echt of nep?<br><span class="step">stap 5</span></td>
+        <td><p>Laptop naar de partner, die kiest de echte uit vier clips. Daarna wisselen.</p>
+          <p>Handen: wie werd gefopt, door 3, 6 of 10 s? <span class="to">Ruis is een hint, geen bewijs.</span></p></td><td class="check"><span></span></td></tr>
+      <tr><td class="time">0:55</td><td class="slide">13</td><td class="block">Denk als een oplichter<br><span class="step">stap 6</span></td>
+        <td><p>10 min vrije modus. Teksten over geld, codes of ontvoering worden geweigerd.</p>
+          <p><span class="g">G2</span><b>1:05</b> Werkblad achterop de handout, in paren, op papier. Schrijf hem op, maak hem niet.</p>
+          <p><b>1:15</b> Twee paren lezen voor: <span class="say">"Wat maakt het overtuigend? Wat zou het breken?"</span> Antwoorden op het bord.</p></td><td class="check"><span></span></td></tr>
+      <tr class="pause"><td class="time">1:20</td><td class="slide">14</td><td class="block">Pauze</td>
+        <td>Vul de terugkomtijd in op de slide. Lopende experimenten lopen door.</td><td class="check"><span></span></td></tr>
+      <tr><td class="time">1:30</td><td class="slide">15–16</td><td class="block">Detecteren<br><span class="step">stap 7</span></td>
+        <td><p>Watermerk ≈1,0 op klonen, overleeft MP3, weg na de telefoonlijn (8 kHz). Classifier noemt na de telefoonlijn alles "echt".</p></td><td class="check"><span></span></td></tr>
+      <tr><td class="time">1:45</td><td class="slide">17</td><td class="block"><span class="g">G3</span> Detectie en wet</td>
+        <td><p><span class="say">"Juist het kanaal van oplichters schakelt beide detectoren uit."</span> Het watermerk zit er alleen in omdat Resemble AI het toevoegt; een ander open model doet dat niet.</p>
+          <p>AI Act art. 50: <span class="say">"Wat doet een label in een live telefoongesprek?"</span></p></td><td class="check"><span></span></td></tr>
+      <tr><td class="time">1:55</td><td class="slide">18–20</td><td class="block"><span class="g">G4</span> Het grote gesprek</td>
+        <td><p><b>Verantwoordelijk:</b> platform, modelmaker of oplichter?</p>
+          <p><b>Open modellen:</b> het scamfilter is één regel (<code>BLOCKLIST</code> in <code>lab/texts.py</code>). <span class="say">"Had je het kunnen weghalen?"</span></p>
+          <p><b>Verdediging:</b> pak de bordantwoorden van G2. Waarom wint een familiewachtwoord van de detector?</p>
+          <p><b>Afsluiter:</b> <span class="say">"Wat ga je vanavond anders doen?"</span> Drie mensen.</p></td><td class="check"><span></span></td></tr>
+      <tr><td class="time">2:20</td><td class="slide">21–22</td><td class="block">Wissen<br><span class="step">stap 8</span></td>
+        <td><p>Iedereen tegelijk: vinkje + <i>Alles wissen</i> → <i>Bewerken → Alle uitvoer wissen</i> → tabblad sluiten.</p>
+          <p>Kopie in Drive opgeslagen? Daar laten verwijderen.</p>
+          <p><b>Meegeven:</b> spreek thuis een familiewachtwoord af.</p></td><td class="check"><span></span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="bottom">
+    <div class="box prep">
+      <h2>Voor de les</h2>
+      <ul>
+        <li>Voicemail op slide 2, QR op slide 1</li>
+        <li>Beamer-audio getest</li>
+        <li>Handouts dubbelzijdig, één per student</li>
+        <li>Pauzetijd op slide 14</li>
+      </ul>
+    </div>
+    <div class="box fix">
+      <h2>Noodplannen</h2>
+      <ul>
+        <li><b>Geen GPU</b><span>Samen op één laptop; de tweede neemt opnieuw op vanaf 3a.</span></li>
+        <li><b>Speler leeg</b><span>In cel 1 <code>PLAYER = "embed"</code>; dan uitvoer wissen verplicht.</span></li>
+        <li><b>Microfoon</b><span>Chrome, of de laptop van de partner.</span></li>
+        <li><b>NL slecht</b><span>In cel 1 <code>MODEL = "v3"</code>.</span></li>
+        <li><b>Achter</b><span>Sla de vrije modus over; het werkblad blijft.</span></li>
+      </ul>
+    </div>
+  </div>
+
+</section>
+
+</body>
+</html>

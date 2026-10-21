@@ -14,6 +14,7 @@ Tweedejaars ICT, blok "De schaduwkant van technologie". Studenten werken in pare
 - [ ] Zet de Colab-link (zie README) op de eerste slide, met een QR-code.
 - [ ] Print `handout/handout.html` dubbelzijdig, één per student: voorkant tijdlijn en spelregels, achterkant het scammer-werkblad. Open hem in Chrome en kies *Afdrukken* (A4, schaal 100%, achtergrondafbeeldingen aan).
 - [ ] Test de audio van de beamer met je demovoicemail.
+- [ ] Print `teacher/lesplan.html` (één A4) om tijdens de les bij de hand te hebben.
 
 ## Minuut voor minuut
 
