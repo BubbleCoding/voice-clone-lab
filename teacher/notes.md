@@ -90,7 +90,7 @@ Discussievragen (slide 9):
 
 ## De code is zichtbaar en aanpasbaar
 
-De kern van het klonen (stap 4 en 5) en de detectie (stap 7) staat als leesbare Python in het notebook. De rest zit in `lab/`, te openen via het 📁-icoon links; wijzigingen daar werken bij de volgende cel (autoreload). Ideeën om studenten te laten proberen:
+De kern van het klonen (stap 4 en 5) en de detectie (stap 7) staat als leesbare Python in het notebook. De rest zit in `lab/`, te openen via het 📁-icoon links; wijzigingen daar werken bij de volgende cel die je uitvoert (`lab/live_edit.py`). Ideeën om studenten te laten proberen:
 - In stap 4 `REF_LENGTHS = [1, 2, 3]`: hoe weinig stem is genoeg? (Doe dit ná het downloaden in stap 6, want de luistertest verwacht 3, 6 en 10 s.)
 - In stap 5 de schuifjes: wat doet CFG met het accent, wat doet temperatuur met de stabiliteit?
 - In `audio.py` het telefoonfilter strenger of milder maken (`phone_line`): bij welke instelling overleeft het watermerk?

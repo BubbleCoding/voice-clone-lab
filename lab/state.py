@@ -15,8 +15,10 @@ PAIR_CODE_RE = re.compile(r"^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{4}$")
 SPEAKERS = ("A", "B")
 
 
-class LabError(Exception):
-    """An error with a Dutch message meant for students."""
+# Defined once: live_edit reloads keep the same class, so `except LabError` keeps matching.
+if "LabError" not in globals():
+    class LabError(Exception):
+        """An error with a Dutch message meant for students."""
 
 
 def data_root():

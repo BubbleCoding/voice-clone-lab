@@ -16,7 +16,7 @@ from . import colab_io, state
 
 MODE = globals().get("MODE", "proxy")  # "proxy" or "embed"
 
-# globals().get keeps the running server when autoreload re-runs this file after an edit.
+# globals().get keeps the running server when live_edit reloads this file after an edit.
 _server = globals().get("_server")
 _base_url = globals().get("_base_url")
 

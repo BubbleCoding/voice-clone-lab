@@ -48,9 +48,6 @@ if not os.path.isdir(REPO_DIR):
 %cd {{REPO_DIR}}
 if not os.path.exists("/content/.vcl_installed"):
     !bash scripts/install_colab.sh && touch /content/.vcl_installed
-# Edits to the files in lab/ take effect the next time you run a cell.
-%load_ext autoreload
-%autoreload 2
 import time
 import pandas as pd
 from IPython.display import display

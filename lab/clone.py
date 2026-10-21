@@ -8,7 +8,7 @@ from pathlib import Path
 from . import audio, state, texts
 from .state import LabError
 
-# globals().get keeps the loaded model when autoreload re-runs this file after an edit.
+# globals().get keeps the loaded model when live_edit reloads this file after an edit.
 MODEL = globals().get("MODEL")
 MODEL_VERSION = globals().get("MODEL_VERSION")
 VERSION = globals().get("VERSION", "v2")  # sounded best for Dutch in the dry run; setup can switch to "v3"

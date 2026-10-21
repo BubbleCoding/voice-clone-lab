@@ -5,7 +5,7 @@ import numpy as np
 from . import audio, state
 
 CLASSIFIER_ID = "mo-thecreator/Deepfake-audio-detection"
-# globals().get keeps loaded models when autoreload re-runs this file after an edit.
+# globals().get keeps loaded models when live_edit reloads this file after an edit.
 CLASSIFIER = globals().get("CLASSIFIER")
 WATERMARKER = globals().get("WATERMARKER")
 

@@ -4,7 +4,7 @@ import functools
 import html
 import time
 
-from . import audio, checks, clone, colab_io, package, player, state, texts, wipe as wipe_mod
+from . import audio, checks, clone, colab_io, live_edit, package, player, state, texts, wipe as wipe_mod
 from .state import LabError
 
 
@@ -53,6 +53,7 @@ def _require_colab(what):
 @friendly
 def setup(player_mode="proxy", model="v2"):
     _install_error_handler()
+    live_edit.install()
     player.MODE = player_mode
     clone.VERSION = model
     t0 = time.perf_counter()
