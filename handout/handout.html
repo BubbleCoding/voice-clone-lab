@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jouw stem, hun scam: handout</title>
+<style>
+  :root {
+    --ink: #000;
+    --muted: #555;
+    --line: #bbb;
+    --sans: "Inter", "Helvetica Neue", Arial, sans-serif;
+    --mono: "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  @page { size: A4; margin: 0; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { margin: 0; background: #e5e5e5; color: var(--ink); font: 11pt/1.4 var(--sans); }
+
+  .toolbar { text-align: center; padding: 16px; font-size: 14px; }
+  .toolbar button { font: 600 14px var(--sans); padding: 10px 20px; border: 0; border-radius: 6px; background: #000; color: #fff; cursor: pointer; }
+  .toolbar p { margin: 8px 0 0; color: var(--muted); }
+
+  .page { width: 210mm; height: 297mm; margin: 0 auto 16px; padding: 0 16mm 14mm; background: #fff;
+          display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,.15); }
+
+  .band { background: #000; color: #fff; margin: 0 -16mm 7mm; padding: 9mm 16mm 7mm; }
+  .band h1 { margin: 0; font-size: 30pt; font-weight: 900; letter-spacing: -0.02em; line-height: 1; text-transform: uppercase; }
+  .band p { margin: 3mm 0 0; font: 9.5pt var(--mono); color: #ccc; letter-spacing: 0.04em; }
+
+  h2 { font-size: 13pt; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 3mm; }
+  .link { font: 10pt var(--mono); margin: 0 0 6mm; padding: 3mm 4mm; border: 1.5px solid var(--ink); }
+  .link b { font-family: var(--sans); }
+
+  table { width: 100%; border-collapse: collapse; margin-bottom: 6mm; }
+  th { text-align: left; font-size: 8.5pt; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted);
+       border-bottom: 2px solid var(--ink); padding: 0 3mm 1.5mm 0; }
+  td { vertical-align: top; padding: 1.7mm 3mm 1.7mm 0; border-bottom: 1px solid var(--line); }
+  td.time { font: 600 10pt var(--mono); width: 15mm; }
+  td.block { font-weight: 700; width: 47mm; }
+  .step { font: 600 9.5pt var(--mono); background: #000; color: #fff; padding: 0.3mm 1.6mm; border-radius: 2px; white-space: nowrap; }
+  tr.pause td { color: var(--muted); }
+
+  .rules { border: 2px solid var(--ink); padding: 4mm 6mm; margin-bottom: 6mm; }
+  .rules ul { margin: 0; padding-left: 5mm; }
+  .rules li { margin: 1mm 0; }
+
+  .home { margin-top: auto; background: #000; color: #fff; padding: 5mm 6mm; font-size: 12pt; }
+  .home b { text-transform: uppercase; letter-spacing: 0.06em; margin-right: 2mm; }
+
+  .intro { margin: 0 0 6mm; font-size: 11.5pt; }
+    .q { display: flex; flex-direction: column; flex: 1; margin-bottom: 4mm; }
+  .q h3 { margin: 0 0 1mm; font-size: 12pt; display: flex; gap: 3mm; align-items: baseline; }
+  .q h3 .n { font: 700 11pt var(--mono); background: #000; color: #fff; padding: 0.4mm 2mm; }
+  .q p { margin: 0 0 1mm; color: var(--muted); font-size: 10pt; }
+  .q .lines { flex: 1; background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(8mm - 1px), var(--line) calc(8mm - 1px), var(--line) 8mm); min-height: 16mm; }
+  .slogan { text-align: center; font-size: 15pt; font-weight: 900; text-transform: uppercase; letter-spacing: 0.04em;
+            border-top: 2px solid var(--ink); padding-top: 4mm; margin: 2mm 0 0; }
+
+  @media print {
+    body { background: #fff; }
+    .toolbar { display: none; }
+    .page { margin: 0; box-shadow: none; break-after: page; }
+    .page:last-child { break-after: auto; }
+  }
+  @media screen and (max-width: 820px) {
+    .page { width: 100%; height: auto; min-height: 0; padding: 0 16px 16px; }
+    .band { margin: 0 -16px 24px; padding: 24px 16px; }
+    .q .lines { min-height: 64px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <button onclick="window.print()">Afdrukken</button>
+  <p>A4, dubbelzijdig (lange zijde), schaal 100%, "Achtergrondafbeeldingen" aan. Eén per student.</p>
+</div>
+
+<section class="page">
+  <header class="band">
+    <h1>Jouw stem,<br>hun scam</h1>
+    <p>VOICE-CLONING LAB · HBO-ICT · DE SCHADUWKANT VAN TECHNOLOGIE</p>
+  </header>
+
+  <div class="link"><b>Notebook:</b> zie de link op het scherm · github.com/BubbleCoding/voice-clone-lab<br>
+    Werk in paren, ieder op een eigen laptop, met je <b>eigen</b> stem.</div>
+
+  <h2>Vandaag</h2>
+  <table>
+    <thead><tr><th>Tijd</th><th>Blok</th><th>Wat je doet</th></tr></thead>
+    <tbody>
+      <tr><td class="time">0:00</td><td class="block">Start</td><td>Open het notebook in Colab en start meteen <span class="step">cel 1</span>. Die duurt een paar minuten.</td></tr>
+      <tr><td class="time">0:15</td><td class="block">Toestemming</td><td><span class="step">stap 2</span> Vier vinkjes. Wacht tot cel 1 "✅ Alles werkt" zegt.</td></tr>
+      <tr><td class="time">0:20</td><td class="block">Opnemen en experiment</td><td><span class="step">stap 3a</span> leestekst (±20 s) <span class="step">stap 3b</span> testzin <span class="step">stap 4</span> klonen uit 3, 6 en 10 s.</td></tr>
+      <tr><td class="time">0:45</td><td class="block">Echt of nep?</td><td><span class="step">stap 5</span> Draai je laptop naar je partner. Welke clip is echt? Daarna wisselen.</td></tr>
+      <tr><td class="time">0:55</td><td class="block">Denk als een oplichter</td><td><span class="step">stap 6</span> Vrije modus. Daarna het werkblad op de achterkant, <b>op papier</b>.</td></tr>
+      <tr class="pause"><td class="time">1:20</td><td class="block">Pauze</td><td></td></tr>
+      <tr><td class="time">1:30</td><td class="block">Kun je het detecteren?</td><td><span class="step">stap 7</span> Wat doet de classifier? Overleeft het watermerk MP3? En de telefoonlijn?</td></tr>
+      <tr><td class="time">1:55</td><td class="block">Gesprek</td><td>Wie is verantwoordelijk? Moeten zulke modellen open zijn? Wat beschermt echt?</td></tr>
+      <tr><td class="time">2:20</td><td class="block">Wissen</td><td><span class="step">stap 8</span> Alles wissen. Dan <i>Bewerken → Alle uitvoer wissen</i> en tabblad sluiten.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="rules">
+    <h2>Spelregels</h2>
+    <ul>
+      <li><b>Alleen je eigen stem.</b> Geen klonen van anderen, ook niet "voor de grap".</li>
+      <li><b>Niets delen buiten deze les.</b> Geen berichten die iemand nadoen of om geld vragen.</li>
+      <li><b>Sla het notebook niet op in Google Drive.</b> Aan het einde wissen we alles samen.</li>
+      <li><b>Niet meedoen mag altijd.</b> Doe dan mee als luisteraar bij je partner, en in alle andere blokken.</li>
+    </ul>
+  </div>
+
+  <div class="home"><b>Thuis</b> Spreek met je familie een wachtwoord af voor noodgevallen aan de telefoon.</div>
+</section>
+
+<section class="page">
+  <header class="band">
+    <h1>Denk als een<br>oplichter</h1>
+    <p>WERKBLAD · IN PAREN · 10 MINUTEN</p>
+  </header>
+
+  <p class="intro">Bedenk samen een voice-scam met een gekloonde stem. Beantwoord de zes vragen hieronder.</p>
+
+  <div class="q"><h3><span class="n">1</span>Slachtoffer</h3><p>Wie bel je, en waarom juist die persoon?</p><div class="lines"></div></div>
+  <div class="q"><h3><span class="n">2</span>Stem</h3><p>Wiens stem gebruik je, en waar haal je 10 seconden van die stem vandaan?</p><div class="lines"></div></div>
+  <div class="q"><h3><span class="n">3</span>Kanaal</h3><p>Telefoon, spraakbericht of videogesprek? Waarom dat kanaal?</p><div class="lines"></div></div>
+  <div class="q"><h3><span class="n">4</span>Vraag</h3><p>Wat wil je hebben: geld, een code, gegevens?</p><div class="lines"></div></div>
+  <div class="q"><h3><span class="n">5</span>Druk</h3><p>Hoe zorg je dat het slachtoffer niet nadenkt: tijd, emotie, geheimhouding?</p><div class="lines"></div></div>
+  <div class="q"><h3><span class="n">6</span>Twijfel</h3><p>Wat zou het slachtoffer laten twijfelen? Wat zou jouw scam breken?</p><div class="lines"></div></div>
+
+  <p class="slogan">Schrijf hem op. Maak hem niet.</p>
+</section>
+
+</body>
+</html>

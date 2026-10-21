@@ -12,7 +12,7 @@ Tweedejaars HBO-ICT, blok "De schaduwkant van technologie". Studenten werken in 
 
 **Een uur voor de les**
 - [ ] Zet de Colab-link (zie README) op de eerste slide, met een QR-code.
-- [ ] Print het scammer-werkblad (achterkant van de handout), één per paar.
+- [ ] Print `handout/handout.html` dubbelzijdig, één per student: voorkant tijdlijn en spelregels, achterkant het scammer-werkblad. Open hem in Chrome en kies *Afdrukken* (A4, schaal 100%, achtergrondafbeeldingen aan).
 - [ ] Test de audio van de beamer met je demovoicemail.
 
 ## Minuut voor minuut
@@ -21,7 +21,7 @@ Tweedejaars HBO-ICT, blok "De schaduwkant van technologie". Studenten werken in 
 - **0:00** "Open de link op het scherm en start meteen cel 1, die duurt een paar minuten."
 - **0:02** "Voor we beginnen: ik kreeg vanochtend een spraakbericht..." Speel je demovoicemail af (`demo-script.md`), zonder iets te zeggen over AI.
 - **0:04** Onthulling: "Dat heb ik nooit ingesproken. Dat was een model, gevoed met 10 seconden van mijn stem, gemaakt op een gratis computer van Google." Vraag: "Wie had het door? Hand omhoog."
-- **0:06** De nieuwszaken (slides 3–5): INTERPOL-campagne (18 okt), de Britse AI-scam-watchlist (19 okt), de Californische moeder die $5.400 verloor aan een nep-ontvoeringsgesprek met de gekloonde stem van haar dochter (7 okt).
+- **0:06** De nieuwszaken (slides 5–7): INTERPOL-campagne (18 okt), de Britse AI-scam-watchlist (19 okt), de Californische moeder die $5.400 verloor aan een nep-ontvoeringsgesprek met de gekloonde stem van haar dochter (7 okt).
 - **0:13** Kijk rond: staat cel 1 overal te draaien?
 
 ### 0:15–0:20 Toestemming

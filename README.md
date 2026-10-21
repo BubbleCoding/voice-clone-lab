@@ -11,7 +11,7 @@ Workshop kit for HBO-ICT (HvA): students clone their own voice, test whether the
 
 ## Teacher
 
-Everything runs in Colab; the teacher needs no server. Run the session from [`teacher/notes.md`](teacher/notes.md) and make the opening voicemail with [`teacher/demo-script.md`](teacher/demo-script.md). The student handout, with the scammer worksheet, is [`handout/handout.md`](handout/handout.md).
+Everything runs in Colab; the teacher needs no server. Run the session from [`teacher/notes.md`](teacher/notes.md) and make the opening voicemail with [`teacher/demo-script.md`](teacher/demo-script.md). The student handout, with the scammer worksheet on the back, is [`handout/handout.html`](handout/handout.html): open it in a browser and print A4 double-sided. The slide rundown for a Dark Tech deck is [`teacher/slides-outline.md`](teacher/slides-outline.md); paste it into Claude to generate the .pptx.
 
 | Command | What it does |
 | --- | --- |
