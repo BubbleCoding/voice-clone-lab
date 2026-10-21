@@ -3,6 +3,7 @@
 import shutil
 import subprocess
 import tempfile
+import warnings
 from pathlib import Path
 
 import numpy as np
@@ -127,7 +128,10 @@ def normalize_loudness(wav, sr=SR, target=TARGET_LUFS):
     loudness = meter.integrated_loudness(wav)
     if not np.isfinite(loudness):
         return wav
-    out = pyloudnorm.normalize.loudness(wav, loudness, target)
+    with warnings.catch_warnings():
+        # pyloudnorm warns about peaks above 0 dBFS; the limiter below handles those.
+        warnings.simplefilter("ignore", UserWarning)
+        out = pyloudnorm.normalize.loudness(wav, loudness, target)
     peak = np.max(np.abs(out))
     limit = 10 ** (-1 / 20)
     if peak > limit:

@@ -1,7 +1,8 @@
-"""Browser I/O for Colab. This is the only module that imports google.colab."""
+"""Browser I/O for Colab: the microphone and the audio players. The only module that uses google.colab."""
 
 import base64
 import json
+import uuid
 
 _RECORD_JS = r"""
 async function vclRecord(maxSeconds, label) {
@@ -67,6 +68,28 @@ async function vclRecord(maxSeconds, label) {
 """
 
 
+_AUDIO_JS = """
+<script>
+(async () => {
+  const el = document.getElementById(%(id)s);
+  try {
+    const r = await google.colab.kernel.invokeFunction(%(callback)s, [%(rel)s], {});
+    const d = r.data['application/json'];
+    if (d.error) throw new Error(d.error);
+    const bin = atob(d.data);
+    const buf = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+    el.src = URL.createObjectURL(new Blob([buf], {type: 'audio/wav'}));
+  } catch (e) {
+    const msg = document.createElement('span');
+    msg.textContent = 'Audio niet beschikbaar (runtime gestopt of gewist).';
+    el.replaceWith(msg);
+  }
+})();
+</script>
+"""
+
+
 def in_colab():
     try:
         import google.colab  # noqa: F401
@@ -85,10 +108,10 @@ def record(max_seconds, label):
     return base64.b64decode(result["data"])
 
 
-def proxy_url(port):
-    """URL through which the browser reaches a server on this runtime. Valid only while the runtime lives."""
+def register_callback(name, func):
+    """Let JavaScript in an output call func through google.colab.kernel.invokeFunction."""
     from google.colab import output
-    return output.eval_js(f"google.colab.kernel.proxyPort({int(port)})")
+    output.register_callback(name, func)
 
 
 def download(path):
@@ -99,3 +122,10 @@ def download(path):
 def delete_runtime():
     from google.colab import runtime
     runtime.unassign()
+
+
+def kernel_audio_tag(callback, rel):
+    """An audio player that asks the kernel callback for its clip when it is displayed."""
+    el_id = f"vcl-{uuid.uuid4().hex}"
+    js = _AUDIO_JS % {"id": json.dumps(el_id), "callback": json.dumps(callback), "rel": json.dumps(rel)}
+    return f'<audio controls id="{el_id}"></audio>{js}'

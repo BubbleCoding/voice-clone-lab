@@ -39,7 +39,7 @@ Het loodgieterswerk zit in het pakket `lab/`. Open het via het 📁-icoon links:
 """
 
 SETUP = f'''#@title 1. Setup: start deze cel meteen (duurt ongeveer 4 minuten)
-PLAYER = "proxy"  #@param ["proxy", "embed"]
+PLAYER = "live"  #@param ["live", "embed"]
 MODEL = "v2"  #@param ["v2", "v3"]
 import os
 REPO_URL = "{REPO_URL}"

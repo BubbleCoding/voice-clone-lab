@@ -1,10 +1,12 @@
 """Inline audio without embedding audio in the notebook.
 
-Clips are served by a small file server on the runtime. Outputs contain only URLs,
-which stop working when the runtime is deleted. MODE = "embed" is the fallback if the
-proxy does not work in a browser; then outputs do contain audio and must be cleared.
+In Colab, each player fetches its clip from the kernel when it is displayed
+(colab_io.kernel_audio_tag), so outputs contain only a file name and stop
+playing when the runtime is deleted. Outside Colab, a small local file server does the
+same. MODE = "embed" is the fallback; then outputs do contain audio and must be cleared.
 """
 
+import base64
 import functools
 import html
 import http.server
@@ -14,12 +16,12 @@ from pathlib import Path
 
 from . import colab_io, state
 
-MODE = globals().get("MODE", "proxy")  # "proxy" or "embed"
+MODE = globals().get("MODE", "live")  # "live" or "embed"
+CALLBACK = "vcl.audio"
 
 # globals().get keeps the running server when live_edit reloads this file after an edit.
 _server = globals().get("_server")
 _base_url = globals().get("_base_url")
-
 
 class _QuietHandler(http.server.SimpleHTTPRequestHandler):
     def log_message(self, *args):
@@ -37,18 +39,15 @@ def _free_port():
 
 
 def start():
+    """Local file server for players outside Colab."""
     global _server, _base_url
     if _server is not None:
         return _base_url
     port = _free_port()
     handler = functools.partial(_QuietHandler, directory=str(state.data_dir()))
-    # Colab's proxy reaches the kernel VM's ports; the VM itself is not publicly reachable.
-    host = "0.0.0.0" if colab_io.in_colab() else "127.0.0.1"
-    _server = http.server.ThreadingHTTPServer((host, port), handler)
+    _server = http.server.ThreadingHTTPServer(("127.0.0.1", port), handler)
     threading.Thread(target=_server.serve_forever, daemon=True).start()
-    _base_url = colab_io.proxy_url(port) if colab_io.in_colab() else f"http://127.0.0.1:{port}/"
-    if not _base_url.endswith("/"):
-        _base_url += "/"
+    _base_url = f"http://127.0.0.1:{port}/"
     return _base_url
 
 
@@ -61,14 +60,26 @@ def stop():
     _base_url = None
 
 
+def serve_clip(rel):
+    """Called from the browser: one clip from the data folder as base64 WAV."""
+    from IPython.display import JSON
+    root = state.data_dir().resolve()
+    path = (root / rel).resolve()
+    if root not in path.parents or not path.is_file():
+        return JSON({"error": "not found"})
+    return JSON({"data": base64.b64encode(path.read_bytes()).decode("ascii")})
+
+
 def _audio_tag(path):
     path = Path(path)
     if MODE == "embed":
         from IPython.display import Audio
         return Audio(str(path))._repr_html_()
-    base = start()
     rel = path.resolve().relative_to(state.data_dir().resolve()).as_posix()
-    src = f"{base}{rel}?v={int(path.stat().st_mtime_ns)}"
+    if colab_io.in_colab():
+        colab_io.register_callback(CALLBACK, serve_clip)
+        return colab_io.kernel_audio_tag(CALLBACK, rel)
+    src = f"{start()}{rel}?v={int(path.stat().st_mtime_ns)}"
     return f'<audio controls preload="none" src="{html.escape(src)}"></audio>'
 
 

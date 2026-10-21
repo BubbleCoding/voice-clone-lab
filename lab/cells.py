@@ -51,7 +51,7 @@ def _require_colab(what):
 # 1. Setup
 
 @friendly
-def setup(player_mode="proxy", model="v2"):
+def setup(player_mode="live", model="v2"):
     _install_error_handler()
     live_edit.install()
     player.MODE = player_mode

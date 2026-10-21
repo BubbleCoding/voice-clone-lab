@@ -6,7 +6,7 @@ Na de dry run wordt er niets nieuws meer gebouwd. Noteer bij elk punt wat er geb
 | --- | --- | --- | --- |
 | 1 | Setup op een verse gratis runtime, onder 5 min | Open de Colab-link in een incognitovenster, draai cel 1, noteer de tijd die hij print. | |
 | 2 | Installatie zonder fallback | Staat er in cel 1 "Installatie klaar" en zes keer ✅? | |
-| 3 | Audiospeler (proxy) speelt af | Stap 3a: speelt de terugluister-speler af? Zo niet: `PLAYER = "embed"`. | |
+| 3 | Audiospeler speelt af | Stap 3a: speelt de terugluister-speler af? Zo niet: `PLAYER = "embed"`. | |
 | 4 | Microfoon: zwakke laptop (Chrome), Safari, telefoon | Stap 3a op elk apparaat. | |
 | 5 | Nederlands klinkt goed bij 3, 6 en 10 s | Stap 4: luister de tabel af. | |
 | 6 | Volledig experiment onder 15 min | Stap 2 tot en met 4 met je eigen stem, met de klok erbij. | |
@@ -34,4 +34,4 @@ Op een Mac (Apple-chip, MPS, 16 GB) is de volledige pijplijn met de echte modell
 
 Let op bij het lezen: de "echte" clips in deze test waren zelf macOS-spraak (synthetisch), dus dat de classifier ze "nep" noemde, zegt niets over echte stemmen. Met echte studentenstemmen kan dat anders uitvallen; check het in de dry run.
 
-Wat alleen in Colab te testen is: GPU, installatie op Colab's Python, de microfooncel, de proxy-audiospeler, en het verwijderen van de runtime.
+Wat alleen in Colab te testen is: GPU, installatie op Colab's Python, de microfooncel, de audiospeler, en het verwijderen van de runtime.
