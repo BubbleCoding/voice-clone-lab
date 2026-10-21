@@ -4,15 +4,10 @@ import functools
 import hashlib
 import json
 import os
-import re
 import time
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-
-# Same alphabet as listening_test/pair_codes.py: no 0/O, 1/I/L.
-PAIR_CODE_RE = re.compile(r"^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{4}$")
-SPEAKERS = ("A", "B")
 
 
 # Defined once: live_edit reloads keep the same class, so `except LabError` keeps matching.
@@ -52,21 +47,12 @@ def _save(state):
     _state_path().write_text(json.dumps(state, indent=2))
 
 
-def normalize_pair_code(code):
-    return (code or "").strip().upper()
-
-
-def record_consent(pair_code, speaker, statements_accepted):
-    pair_code = normalize_pair_code(pair_code)
-    if not PAIR_CODE_RE.match(pair_code):
-        raise LabError("Ongeldige paircode. Gebruik de 4 tekens van jullie paarkaart.")
-    if speaker not in SPEAKERS:
-        raise LabError("Kies spreker A of B.")
-    if not all(statements_accepted):
+def record_consent(statements_accepted):
+    if not statements_accepted or not all(statements_accepted):
         raise LabError("Vink alle vier de verklaringen aan om verder te gaan.")
     state = load()
-    # Only the timestamp, pair code and speaker letter. No names.
-    state["consent"] = {"time": time.strftime("%Y-%m-%dT%H:%M:%S"), "pair_code": pair_code, "speaker": speaker}
+    # Only the timestamp. No names.
+    state["consent"] = {"time": time.strftime("%Y-%m-%dT%H:%M:%S")}
     _save(state)
     return state["consent"]
 

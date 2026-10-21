@@ -17,7 +17,7 @@ def test_notebook_requests_t4_gpu_and_has_no_outputs():
 
 def test_cell_order_matches_lesson():
     markers = ["ui.setup(", "ui.consent()", "ui.record_reference()", "ui.record_target()", "model.generate(",
-               "TEXT = ", "ui.download()", "detect.fake_score(", "ui.wipe()"]
+               "ui.quiz()", "TEXT = ", "detect.fake_score(", "ui.wipe()"]
     assert len(CODE) == len(markers)
     for src, marker in zip(CODE, markers):
         assert marker in src, marker
@@ -35,6 +35,12 @@ def test_no_public_links_drive_or_reference_upload():
     everything = "\n".join(CODE + list(LAB_SOURCES.values()))
     for forbidden in ("share=True", "drive.mount", "files.upload", "gradio", "ngrok"):
         assert forbidden not in everything, forbidden
+
+
+def test_no_listening_test_pair_codes_or_downloads_for_students():
+    text = json.dumps(NB["cells"], ensure_ascii=False).lower()
+    for gone in ("luistertest", "paircode", "paarkaart", "ui.download", ".zip"):
+        assert gone not in text, gone
 
 
 def test_only_colab_io_imports_google_colab():

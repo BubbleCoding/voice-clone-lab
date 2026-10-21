@@ -8,7 +8,7 @@ READING_PASSAGE = (
     "wat we gaan leren."
 )
 
-# NL1 is the listening-test sentence: students record it themselves and clone it.
+# NL1 is the quiz sentence (step 5): students record it themselves and clone it.
 TARGET_ID = "NL1"
 
 SENTENCES = [

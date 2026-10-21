@@ -1,10 +1,10 @@
-"""Dutch UI for the notebook's plumbing cells (setup, consent, recording, download, wipe) and result displays."""
+"""Dutch UI for the notebook's plumbing cells (setup, consent, recording, quiz, wipe) and result displays."""
 
 import functools
 import html
 import time
 
-from . import audio, checks, clone, colab_io, live_edit, package, player, state, texts, wipe as wipe_mod
+from . import audio, checks, clone, colab_io, live_edit, package, player, quiz as quiz_mod, state, texts, wipe as wipe_mod
 from .state import LabError
 
 
@@ -72,8 +72,6 @@ def setup(player_mode="proxy", model="v2"):
 @friendly
 def consent():
     import ipywidgets as w
-    code = w.Text(description="Paircode:", placeholder="bijv. K7QM", layout=w.Layout(width="220px"))
-    speaker = w.ToggleButtons(options=["A", "B"], description="Spreker:")
     boxes = [w.Checkbox(description=s, indent=False, layout=w.Layout(width="auto")) for s in texts.CONSENT_STATEMENTS]
     button = w.Button(description="Bevestig", button_style="primary")
     out = w.Output()
@@ -82,8 +80,8 @@ def consent():
         out.clear_output()
         with out:
             try:
-                info = state.record_consent(code.value, speaker.value, [b.value for b in boxes])
-                _ok(f"Toestemming vastgelegd voor paar {info['pair_code']}, spreker {info['speaker']}. Ga verder met stap 3.")
+                state.record_consent([b.value for b in boxes])
+                _ok("Toestemming vastgelegd. Ga verder met stap 3.")
             except LabError as e:
                 _error(str(e))
 
@@ -91,7 +89,7 @@ def consent():
     from IPython.display import display
     _show_html("<p>Je opnames worden tijdens de les verwerkt op servers van Google (Colab). "
                "Er wordt niets in Google Drive opgeslagen. Sla geen kopie van dit notebook op in Drive.</p>")
-    display(w.VBox([code, speaker, *boxes, button, out]))
+    display(w.VBox([*boxes, button, out]))
 
 
 # 3. Record
@@ -171,12 +169,43 @@ def show_experiment(results):
     _ok(f"{len(results)} klonen gemaakt in {total:.0f} s rekentijd.")
 
 
-# 6. Download
+# 5. Echt of nep?
 
 @friendly
-def download(all_clips=False):
-    zip_path = package.make_all_clips_zip() if all_clips else package.make_zip()
-    _ok(f"{zip_path.name} gemaakt. Upload dit bestand straks in de luistertest.")
+def quiz():
+    import ipywidgets as w
+    from IPython.display import display
+    clips = quiz_mod.prepare()
+    _show_html(f"<p style='font-size:16px'>Draai je laptop naar je partner. Eén van deze {len(clips)} clips is je echte "
+               "opname, de rest is een kloon. Laat je partner luisteren en kiezen: <b>welke is echt?</b></p>")
+    player.show_grid(["Clip", ""], [(f"Clip {c['nr']}", [c["path"]]) for c in clips])
+    buttons = [w.Button(description=f"Clip {c['nr']} is echt", layout=w.Layout(width="auto")) for c in clips]
+    out = w.Output()
+
+    def reveal(guess):
+        for b in buttons:
+            b.disabled = True
+        real = next(c for c in clips if c["real"])
+        with out:
+            if guess["real"]:
+                _ok(f"Goed geraden: clip {real['nr']} is echt.")
+            else:
+                _error(f"Fout: clip {guess['nr']} is een {guess['label']}. Clip {real['nr']} is echt.")
+            rows = "".join(f"<li>{'<b>' if c['real'] else ''}Clip {c['nr']}: {html.escape(c['label'])}{'</b>' if c['real'] else ''}</li>"
+                           for c in clips)
+            _show_html(f"<ul style='font-size:16px'>{rows}</ul><p>Opnieuw schudden? Voer deze cel nog een keer uit.</p>")
+
+    for b, c in zip(buttons, clips):
+        b.on_click(lambda _, c=c: reveal(c))
+    display(w.VBox([w.HBox(buttons), out]))
+
+
+# For the teacher's demo voicemail (demo-script.md); not a student step.
+
+@friendly
+def download():
+    zip_path = package.make_all_clips_zip()
+    _ok(f"{zip_path.name} gemaakt.")
     if colab_io.in_colab():
         colab_io.download(zip_path)
 

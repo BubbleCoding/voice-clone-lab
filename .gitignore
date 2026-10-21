@@ -1,6 +1,5 @@
 # Audio and session data: never commit
 data/
-listening_test/var/
 *.wav
 *.mp3
 *.webm

@@ -4,22 +4,19 @@ from lab import state
 from lab.state import LabError
 
 
-def test_consent_requires_valid_code_speaker_and_all_boxes():
+def test_consent_requires_all_boxes():
     with pytest.raises(LabError):
-        state.record_consent("K7Q", "A", [True] * 4)
+        state.record_consent([True, True, False, True])
     with pytest.raises(LabError):
-        state.record_consent("K0QM", "A", [True] * 4)  # 0 is not in the alphabet
-    with pytest.raises(LabError):
-        state.record_consent("K7QM", "C", [True] * 4)
-    with pytest.raises(LabError):
-        state.record_consent("K7QM", "A", [True, True, False, True])
-    info = state.record_consent(" k7qm ", "B", [True] * 4)
-    assert info["pair_code"] == "K7QM" and info["speaker"] == "B"
+        state.record_consent([])
+    assert state.consent() is None
+    state.record_consent([True] * 4)
+    assert state.consent()
 
 
-def test_consent_stores_no_more_than_time_code_speaker():
-    state.record_consent("K7QM", "A", [True] * 4)
-    assert set(state.consent()) == {"time", "pair_code", "speaker"}
+def test_consent_stores_only_the_time():
+    state.record_consent([True] * 4)
+    assert set(state.consent()) == {"time"}
 
 
 def test_guard_blocks_until_consent():
@@ -29,7 +26,7 @@ def test_guard_blocks_until_consent():
 
     with pytest.raises(LabError):
         protected()
-    state.record_consent("K7QM", "A", [True] * 4)
+    state.record_consent([True] * 4)
     assert protected() == "ran"
 
 

@@ -9,19 +9,19 @@ Na de dry run wordt er niets nieuws meer gebouwd. Noteer bij elk punt wat er geb
 | 3 | Audiospeler (proxy) speelt af | Stap 3a: speelt de terugluister-speler af? Zo niet: `PLAYER = "embed"`. | |
 | 4 | Microfoon: zwakke laptop (Chrome), Safari, telefoon | Stap 3a op elk apparaat. | |
 | 5 | Nederlands klinkt goed bij 3, 6 en 10 s | Stap 4: luister de tabel af. | |
-| 6 | Volledig experiment onder 15 min | Stap 2 tot en met 6 met je eigen stem, met de klok erbij. | |
-| 7 | Demoset gemaakt | `demo-script.md`. | |
-| 8 | Luistertest met 30 raters | `make load-test` moet PASS geven. Upload daarna je demoset vanaf twee telefoons via het klaswifi (of de hotspot). | |
+| 6 | Volledig experiment onder 15 min | Stap 2 tot en met 4 met je eigen stem, met de klok erbij. | |
+| 7 | Demovoicemail gemaakt | `demo-script.md`. | |
+| 8 | Echt of nep? werkt | Stap 5: spelen alle vier de clips, en laat een klik op een knop zien welke echt was? Voer de cel opnieuw uit: is de volgorde anders? | |
 | 9 | Detectie: 20 clips onder 3 min | Stap 7, noteer de tijd die hij print. | |
 | 10 | Watermerk na MP3 en telefoonlijn | Stap 7, samenvatting: kolom `watermerk_gem` per versie. | |
 | 11 | Wat de classifier goed heeft | Stap 7, samenvatting: kolom `classifier_goed`. | |
 | 12 | Wissen | Stap 8: is de runtime weg? Zijn na *Alle uitvoer wissen* alle spelers weg? | |
-| 13 | Geen-GPU-fallback | Twee mensen na elkaar op één runtime (stap 2 met A, daarna met B). | |
+| 13 | Geen-GPU-fallback | Twee mensen na elkaar op één runtime: na stap 5 neemt de tweede opnieuw op vanaf stap 3a. Krijgt stap 5 de nieuwe stem? | |
 | 14 | Versies bevriezen | Voeg op de werkende runtime een cel `!pip freeze` toe, stuur de uitvoer naar de coding agent: die pint `requirements-colab.txt` en tagt de repo `v1.0-dry-run`. | |
 
 ## Referentie: lokale test van de agent (20 oktober, MacBook, geen GPU)
 
-Op een Mac (Apple-chip, MPS, 16 GB) is de volledige pijplijn met de echte modellen getest: toestemming, opnemen (browserbytes gesimuleerd met de macOS-stem "Ellen"), experiment, zip, detectie en wissen. Uitkomsten:
+Op een Mac (Apple-chip, MPS, 16 GB) is de volledige pijplijn met de echte modellen getest: toestemming, opnemen (browserbytes gesimuleerd met de macOS-stem "Ellen"), experiment, quiz, detectie en wissen. Uitkomsten:
 
 | Onderdeel | Resultaat |
 | --- | --- |

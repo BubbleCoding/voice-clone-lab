@@ -22,7 +22,7 @@ Voer de cellen van boven naar beneden uit met ▶ of Shift+Enter.
 
 ### Onder de motorkap
 
-De kern staat gewoon in dit notebook: het klonen (stap 4 en 5) en de detectie (stap 7) zijn leesbare Python. Pas ze gerust aan en voer de cel opnieuw uit.
+De kern staat gewoon in dit notebook: het klonen (stap 4 en 6) en de detectie (stap 7) zijn leesbare Python. Pas ze gerust aan en voer de cel opnieuw uit.
 
 Het loodgieterswerk zit in het pakket `lab/`. Open het via het 📁-icoon links: `voice-clone-lab/lab/`. Dubbelklik op een bestand om het te bewerken; je wijziging werkt bij de volgende cel die je uitvoert.
 
@@ -31,6 +31,7 @@ Het loodgieterswerk zit in het pakket `lab/`. Open het via het 📁-icoon links:
 | [`clone.py`]({LAB_URL}/clone.py) | Model laden, referenties knippen, de eigen-stem-controle, het scamfilter |
 | [`audio.py`]({LAB_URL}/audio.py) | Knippen, pauzes inkorten, volume, en de MP3- en telefoonlijnfilters |
 | [`detect.py`]({LAB_URL}/detect.py) | De deepfake-classifier en de watermerkdetector |
+| [`quiz.py`]({LAB_URL}/quiz.py) | Echt of nep?: de clips schudden en even hard maken |
 | [`colab_io.py`]({LAB_URL}/colab_io.py) | De microfoonopname in je browser (JavaScript) |
 | [`texts.py`]({LAB_URL}/texts.py) | De vaste zinnen en de lijst met verboden woorden |
 | [`state.py`]({LAB_URL}/state.py) | Toestemming en de controle dat een opname echt live was |
@@ -135,25 +136,24 @@ CELLS = [
     ("md", "## 1. Setup\nStart deze cel meteen. Hij installeert alles en laadt de modellen. Wacht tot onderaan **✅ Alles werkt** staat.\n\n"
            "Zie je **❌ Geen GPU**? Kies *Runtime → Runtimetype wijzigen → T4 GPU* en voer de cel opnieuw uit."),
     ("form", SETUP),
-    ("md", "## 2. Toestemming\nVul de code van jullie paarkaart in, kies of je spreker A of B bent, en vink de vier verklaringen aan. "
-           "Zonder toestemming werken de volgende stappen niet."),
+    ("md", "## 2. Toestemming\nVink de vier verklaringen aan. Zonder toestemming werken de volgende stappen niet."),
     ("code", "ui.consent()"),
     ("md", "## 3a. Opnemen: leestekst\nDe browser vraagt om toegang tot je microfoon. Lees de tekst voor die verschijnt (ongeveer 20 seconden). "
            "Dit is het voorbeeld waarmee het model je stem kloont. Neem op in een stille hoek: het model kopieert ook ruis.\n\n"
            f"Hoe de opname werkt: [`colab_io.py`]({LAB_URL}/colab_io.py)."),
     ("code", "ui.record_reference()"),
-    ("md", "## 3b. Opnemen: testzin\nLees één zin voor. Deze echte opname komt straks in de luistertest, naast klonen van precies dezelfde zin."),
+    ("md", "## 3b. Opnemen: testzin\nLees één zin voor. In stap 5 moet je partner deze echte opname herkennen tussen klonen van precies dezelfde zin."),
     ("code", "ui.record_target()"),
     ("md", "## 4. Experiment: hoeveel stem is genoeg?\nDit is de hele kloon-code. Het model maakt vier zinnen (twee Nederlands, twee Engels) "
            "met **3, 6 en 10 seconden** van jouw stem als voorbeeld. Let op de generatietijd per clip.\n\n"
            "Wist je dat Chatterbox nooit meer dan 10 seconden van je stem gebruikt? Meer audio maakt de kloon niet beter.\n\n"
-           "Laat `REF_LENGTHS` op 3, 6 en 10 staan voor de luistertest. Daarna mag je alles proberen."),
+           "Laat `REF_LENGTHS` op 3, 6 en 10 staan tot na stap 5. Daarna mag je alles proberen."),
     ("code", EXPERIMENT),
-    ("md", "## 5. Vrije modus\nTyp rechts een zin en speel met de instellingen. Iemand anders nadoen of om geld, codes of gegevens vragen is **niet** toegestaan."),
+    ("md", "## 5. Echt of nep?\nJe partner hoort je echte testzin en de klonen ervan, door elkaar en even hard. Welke is echt? "
+           "Draai je laptop naar je partner, laat luisteren en kiezen. Daarna wissel je om."),
+    ("code", "ui.quiz()"),
+    ("md", "## 6. Vrije modus\nTyp rechts een zin en speel met de instellingen. Iemand anders nadoen of om geld, codes of gegevens vragen is **niet** toegestaan."),
     ("code", FREE_MODE),
-    ("md", "## 6. Downloaden voor de luistertest\nDit downloadt een zip met je echte testzin en drie klonen ervan (3, 6 en 10 s). "
-           "Upload die zip straks in de luistertest van de docent (het adres staat op het scherm)."),
-    ("code", "ui.download()"),
     ("md", "## 7. Detectie\nElke clip gaat langs een deepfake-classifier en een watermerk-detector (Chatterbox stopt een onhoorbaar watermerk in elke kloon). "
            "Daarna gebeurt hetzelfde na **MP3-compressie** en na een **telefoonlijn-filter**.\n\n"
            f"Welke methode overleeft de telefoonlijn? Wil je het filter aanpassen? Het staat in `phone_line()` in [`audio.py`]({LAB_URL}/audio.py)."),

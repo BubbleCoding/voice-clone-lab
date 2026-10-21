@@ -11,7 +11,7 @@ import sys
 from pathlib import Path
 
 # Dependencies first, so each module picks up the fresh version of what it imports.
-ORDER = ["state", "texts", "audio", "colab_io", "player", "clone", "detect", "package", "wipe", "checks", "cells"]
+ORDER = ["state", "texts", "audio", "colab_io", "player", "clone", "detect", "quiz", "package", "wipe", "checks", "cells"]
 
 LAB_DIR = Path(__file__).resolve().parent
 _mtimes = globals().get("_mtimes")

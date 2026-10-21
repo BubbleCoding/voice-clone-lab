@@ -1,29 +1,20 @@
 import zipfile
 
-import pytest
-import soundfile as sf
-
 from conftest import run_experiment
-from lab import clone, package, state, wipe
-from lab.state import LabError
+from lab import clone, package, quiz, wipe
 
 
-def test_zip_has_real_and_three_clones_at_24k(recordings, fake_model):
-    with pytest.raises(LabError):
-        package.make_zip()  # no clones yet
+def test_teacher_zip_has_every_real_and_cloned_clip(recordings, fake_model):
     run_experiment()
-    path = package.make_zip()
-    assert path.name == "K7QM-A.zip"
-    with zipfile.ZipFile(path) as zf:
-        assert sorted(zf.namelist()) == sorted(package.ZIP_NAMES)
-    for name in package.ZIP_NAMES:
-        info = sf.info(state.subdir("test") / name)
-        assert info.samplerate == 24000 and info.channels == 1
+    with zipfile.ZipFile(package.make_all_clips_zip()) as zf:
+        names = zf.namelist()
+    assert "real/NL1_echt.wav" in names and "clones/NL1_3s.wav" in names
+    assert len([n for n in names if n.startswith("clones/")]) == 12
 
 
 def test_wipe_removes_all_audio(recordings, fake_model, data_dir):
     run_experiment()
-    package.make_zip()
+    quiz.prepare()
     assert any(data_dir.rglob("*.wav"))
     wipe.wipe_data()
     assert not data_dir.exists()

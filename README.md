@@ -1,6 +1,6 @@
 # Jouw stem, hun scam: voice-clone lab
 
-Workshop kit for HBO-ICT (HvA): students clone their own voice, run a blind listening test, and try to detect the fakes.
+Workshop kit for HBO-ICT (HvA): students clone their own voice, test whether their partner can tell real from fake, try to detect the fakes, and discuss the dark side of voice cloning.
 
 ## Studenten
 
@@ -11,19 +11,15 @@ Workshop kit for HBO-ICT (HvA): students clone their own voice, run a blind list
 
 ## Teacher
 
+Everything runs in Colab; the teacher needs no server. Run the session from [`teacher/notes.md`](teacher/notes.md) and make the opening voicemail with [`teacher/demo-script.md`](teacher/demo-script.md). The student handout, with the scammer worksheet, is [`handout/handout.md`](handout/handout.md).
+
 | Command | What it does |
 | --- | --- |
-| `make setup-test` | Install the listening-test app in `.venv` (needs Python 3.10+) |
-| `make pair-codes` | Create 20 pair codes and open printable pair cards |
-| `make serve-test` | Serve the listening test on the classroom LAN (port 8000); prints the URL and a QR code |
-| `make load-test` | 30 simulated raters for 2 minutes against a temporary server |
-| `make wipe-test` | Delete all uploaded clips, ratings and pair codes |
 | `make test` | Unit tests (CPU only, no model downloads) |
-
-Run the session from [`teacher/notes.md`](teacher/notes.md). The student handout is [`handout/handout.md`](handout/handout.md).
+| `make notebook` | Regenerate the notebook from `scripts/build_notebook.py` |
 
 ## Layout
 
-`lab/` is the Python package the notebook imports (record, clone, detect, wipe); `lab/cells.py` holds the Dutch UI for each notebook cell. `listening_test/` is the Flask + SQLite app for the teacher laptop. `scripts/build_notebook.py` generates the notebook, so edit the cells there and run `make notebook`.
+`lab/` is the Python package the notebook imports (record, clone, quiz, detect, wipe); `lab/cells.py` holds the Dutch UI for each notebook cell. `scripts/build_notebook.py` generates the notebook, so edit the cells there and run `make notebook`.
 
 Models: [Chatterbox Multilingual V2 (V3 selectable)](https://github.com/resemble-ai/chatterbox) (MIT, Perth watermark) and [mo-thecreator/Deepfake-audio-detection](https://huggingface.co/mo-thecreator/Deepfake-audio-detection) (Apache-2.0).

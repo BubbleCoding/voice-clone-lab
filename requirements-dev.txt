@@ -1,6 +1,7 @@
 # For `make test` on a laptop: the lab package without the models.
--r listening_test/requirements.txt
 pytest>=8
+numpy>=1.24
+soundfile>=0.12
 librosa>=0.11
 pyloudnorm
 pandas

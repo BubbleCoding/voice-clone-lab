@@ -140,7 +140,7 @@ def cut(wav, seconds, sr=SR, fade_s=0.0):
 
 
 def prepare_for_test(src, dst):
-    """Same rate, trimming and loudness for every listening-test clip, so format gives nothing away."""
+    """Same rate, trimming and loudness for every quiz clip, so format gives nothing away."""
     wav = normalize_loudness(trim(load(src)))
     return save(dst, wav)
 

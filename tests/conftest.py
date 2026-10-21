@@ -34,7 +34,7 @@ def speechlike(seconds, sr=audio.SR, seed=0):
 
 @pytest.fixture
 def consented():
-    state.record_consent("K7QM", "A", [True] * 4)
+    state.record_consent([True] * 4)
 
 
 @pytest.fixture
