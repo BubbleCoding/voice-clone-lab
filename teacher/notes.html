@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Docentnotities Jouw stem</title>
+<style>
+  :root {
+    --ink: #000;
+    --muted: #555;
+    --line: #bbb;
+    --soft: #f2f2f2;
+    --sans: "Inter", "Helvetica Neue", Arial, sans-serif;
+    --mono: "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  @page { size: A4; margin: 14mm 15mm 14mm; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { margin: 0; background: #e5e5e5; color: var(--ink); font: 10pt/1.45 var(--sans); }
+
+  .toolbar { text-align: center; padding: 16px; font-size: 14px; }
+  .toolbar button { font: 600 14px var(--sans); padding: 10px 20px; border: 0; border-radius: 6px; background: #000; color: #fff; cursor: pointer; }
+  .toolbar p { margin: 8px 0 0; color: var(--muted); }
+
+  .doc { width: 210mm; margin: 0 auto 16px; padding: 0 15mm 14mm; background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,.15); }
+
+  .band { background: #000; color: #fff; margin: 0 -15mm 6mm; padding: 9mm 15mm 7mm; }
+  .band h1 { margin: 0; font-size: 26pt; font-weight: 900; letter-spacing: -0.02em; line-height: 1; text-transform: uppercase; }
+  .band p { margin: 3mm 0 0; font: 9pt var(--mono); color: #ccc; letter-spacing: 0.04em; }
+
+  h2 { font-size: 13pt; font-weight: 900; text-transform: uppercase; letter-spacing: 0.06em; margin: 8mm 0 3mm;
+       padding-bottom: 1.5mm; border-bottom: 2px solid var(--ink); break-after: avoid; }
+  h3 { font-size: 10pt; font-weight: 800; margin: 0 0 1.5mm; break-after: avoid; }
+  p { margin: 0 0 2mm; }
+  ul, ol { margin: 0 0 2mm; padding-left: 5mm; }
+  li { margin: 0.8mm 0; }
+  code { font: 8.8pt var(--mono); background: var(--soft); padding: 0 1mm; border-radius: 2px; }
+  .say { font-style: italic; }
+  .muted { color: var(--muted); }
+
+  .goal { border: 2px solid var(--ink); padding: 3.5mm 5mm; font-size: 10.5pt; }
+  .goal b { text-transform: uppercase; letter-spacing: 0.06em; font-size: 9pt; display: block; margin-bottom: 1mm; }
+
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; }
+  .checks { list-style: none; padding: 0; }
+  .checks li { position: relative; padding-left: 6mm; }
+  .checks li::before { content: ""; position: absolute; left: 0; top: 0.9mm; width: 3.3mm; height: 3.3mm; border: 1.4px solid var(--ink); }
+
+  .block { display: grid; grid-template-columns: 22mm 1fr; gap: 4mm; padding: 3.5mm 0; border-bottom: 1px solid var(--line); break-inside: avoid; }
+  .block:last-child { border-bottom: 0; }
+  .when { font: 700 10pt var(--mono); }
+  .when .chip { display: inline-block; background: #000; color: #fff; padding: 0.6mm 1.8mm; border-radius: 2px; }
+  .when small { display: block; margin-top: 1.5mm; font: 8pt var(--mono); color: var(--muted); }
+  .block h3 .step { font: 600 8pt var(--mono); background: #000; color: #fff; padding: 0.3mm 1.4mm; border-radius: 2px; margin-left: 1.5mm; white-space: nowrap; vertical-align: 1px; }
+  .block.pause h3, .block.pause p { color: var(--muted); }
+
+  .g { border: 2px solid var(--ink); padding: 2.5mm 4mm; margin: 2.5mm 0 1mm; break-inside: avoid; }
+  .g .tag { font: 700 8.5pt var(--mono); background: #000; color: #fff; padding: 0.3mm 1.6mm; margin-right: 2mm; }
+  .g .head { font-weight: 800; margin-bottom: 1.2mm; }
+  .g .steer { margin: 1.5mm 0 0; padding-top: 1.5mm; border-top: 1px dashed var(--line); }
+  .g .steer::before { content: "Stuur naar → "; font-weight: 700; }
+
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font-size: 8pt; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); border-bottom: 2px solid var(--ink); padding: 0 3mm 1.2mm 0; }
+  td { vertical-align: top; padding: 2mm 3mm 2mm 0; border-bottom: 1px solid var(--line); }
+  td:first-child { font-weight: 800; width: 38mm; }
+  tr { break-inside: avoid; }
+
+  .ideas li { margin: 1.2mm 0; }
+  .note { background: var(--soft); padding: 3mm 4mm; border-left: 4px solid var(--ink); }
+
+  @media print {
+    body { background: #fff; }
+    .toolbar { display: none; }
+    .doc { width: auto; margin: 0; padding: 0; box-shadow: none; }
+    .band { margin: 0 0 6mm; padding: 7mm 6mm 6mm; }
+  }
+  @media screen and (max-width: 820px) {
+    .doc { width: 100%; padding: 0 16px 16px; }
+    .band { margin: 0 -16px 20px; padding: 24px 16px; }
+    .cols { grid-template-columns: 1fr; gap: 0; }
+    .block { grid-template-columns: 1fr; gap: 6px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <button onclick="window.print()">Afdrukken</button>
+  <p>A4, dubbelzijdig, schaal 100%, "Achtergrondafbeeldingen" aan.</p>
+</div>
+
+<main class="doc">
+  <header class="band">
+    <h1>Docentnotities</h1>
+    <p>JOUW STEM, HUN SCAM · 150 MIN · TWEEDEJAARS ICT · DE SCHADUWKANT VAN TECHNOLOGIE</p>
+  </header>
+
+  <p>Studenten werken in paren, ieder op een eigen laptop, met hun eigen stem. Al het rekenwerk draait in Google Colab; je hebt zelf alleen de beamer en je slides nodig.</p>
+
+  <div class="goal"><b>Doel van de les</b>Studenten ervaren hoe makkelijk het is om een stem te klonen, en praten over de schaduwkant: oplichting, wie verantwoordelijk is, en wat wel en niet beschermt. Het notebook is het middel; de gesprekken zijn de kern. Daarom zitten er vier gespreksmomenten (G1 tot en met G4) door de les heen.</div>
+
+  <h2>Voor de les</h2>
+  <div class="cols">
+    <div>
+      <h3>De dag ervoor (dry run)</h3>
+      <ul class="checks">
+        <li>Volg de checklist in <code>dry-run.md</code> en noteer de uitkomsten.</li>
+        <li>Maak je demovoicemail met <code>demo-script.md</code> (ongeveer 15 minuten).</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Een uur voor de les</h3>
+      <ul class="checks">
+        <li>Zet de Colab-link op de eerste slide, met een QR-code.</li>
+        <li>Print <code>handout/handout.html</code> dubbelzijdig, één per student: voorkant tijdlijn en spelregels, achterkant het scammer-werkblad.</li>
+        <li>Test de audio van de beamer met je demovoicemail.</li>
+        <li>Print <code>teacher/lesplan.html</code> (één A4) om tijdens de les bij de hand te hebben.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Minuut voor minuut</h2>
+
+  <section class="block">
+    <div class="when"><span class="chip">0:00</span><small>slide 1–7</small></div>
+    <div>
+      <h3>Hook</h3>
+      <ul>
+        <li><b>0:00</b> <span class="say">"Open de link op het scherm en start meteen cel 1, die duurt een paar minuten."</span></li>
+        <li><b>0:02</b> <span class="say">"Voor we beginnen: ik kreeg vanochtend een spraakbericht..."</span> Speel je demovoicemail af (<code>demo-script.md</code>), zonder iets te zeggen over AI.</li>
+        <li><b>0:04</b> Onthulling: <span class="say">"Dat heb ik nooit ingesproken. Dat was een model, gevoed met 10 seconden van mijn stem, gemaakt op een gratis computer van Google."</span> Vraag: <span class="say">"Wie had het door? Hand omhoog."</span></li>
+        <li><b>0:06</b> De nieuwszaken (slides 5–7): INTERPOL-campagne (18 okt), de Britse AI-scam-watchlist (19 okt), de Californische moeder die $5.400 verloor aan een nep-ontvoeringsgesprek met de gekloonde stem van haar dochter (7 okt).</li>
+        <li><b>0:13</b> Kijk rond: staat cel 1 overal te draaien?</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="when"><span class="chip">0:15</span><small>slide 8–9</small></div>
+    <div>
+      <h3>Toestemming <span class="step">stap 2</span></h3>
+      <ul>
+        <li>Laat iedereen stap 2 lezen en de vier vinkjes zetten. Benadruk: alleen je eigen stem, niets delen, alles wordt gewist, niet meedoen mag altijd.</li>
+        <li><b>Opt-out:</b> wie niet wil opnemen of geen Google-account wil gebruiken, doet mee als luisteraar bij de partner (stap 5) en in alle gesprekken.</li>
+        <li>Loop rond: staat er in cel 1 onderaan "✅ Alles werkt"?<br>
+          <b>❌ Geen GPU:</b> <i>Runtime → Runtimetype wijzigen → T4 GPU</i> en cel 1 opnieuw. Lukt het niet, dan werkt het paar samen op één laptop: eerst de ene stem tot en met stap 5, daarna neemt de ander opnieuw op vanaf stap 3a (de opnames worden overschreven).</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="when"><span class="chip">0:20</span><small>slide 10</small></div>
+    <div>
+      <h3>Opnemen en experiment <span class="step">3a</span> <span class="step">3b</span> <span class="step">4</span></h3>
+      <ul>
+        <li><b>3a leestekst:</b> de browser vraagt microfoontoegang. Tip: stille hoek, laptop dichtbij, normaal tempo.</li>
+        <li><b>3b testzin:</b> één keer de zin voorlezen. Dit wordt de echte clip in de quiz van stap 5.</li>
+        <li><b>4 experiment:</b> 12 klonen, een paar minuten op een T4. Laat ze de generatietijd en de realtime-factor bekijken: <span class="say">"Hoe lang duurt het om iemand te laten zeggen wat je wilt?"</span></li>
+      </ul>
+      <div class="g">
+        <div class="head"><span class="tag">G1</span>Het 10-secondenplafond · 5 min, terwijl het model rekent</div>
+        <p><span class="say">"Chatterbox gebruikt maximaal 10 seconden van je stem. Hoeveel clips van 10 seconden van jou staan er online?"</span></p>
+        <p>Laat ze echt tellen: Instagram- en TikTok-stories, YouTube, de begroeting van hun voicemail, opgenomen colleges, spraakberichten in groepsapps.</p>
+        <p class="steer">Je stem is geen geheim meer. Wie een paar seconden van je heeft, heeft genoeg.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="when"><span class="chip">0:45</span><small>slide 11–12</small></div>
+    <div>
+      <h3>Echt of nep? <span class="step">stap 5</span></h3>
+      <ul>
+        <li><span class="say">"Draai je laptop naar je partner. Die luistert naar vier clips (je echte testzin en drie klonen, door elkaar en even hard) en kiest welke echt is. Daarna wisselen."</span></li>
+        <li>Klassikaal turven met handen: <span class="say">"Wie werd voor de gek gehouden? Door welke kloon: 3, 6 of 10 seconden?"</span></li>
+        <li><b>Ruis als verraad:</b> de echte opname bevat kamergeluid, de kloon soms niet. Dat is een hint, geen bewijs: een oplichter voegt zo ruis toe, en over de telefoon valt het weg.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="when"><span class="chip">0:55</span><small>slide 13</small></div>
+    <div>
+      <h3>Denk als een oplichter <span class="step">stap 6</span></h3>
+      <ul>
+        <li><b>0:55 Vrije modus, 10 min:</b> laat ze spelen met de schuifjes. Teksten over geld, codes of ontvoering worden geweigerd.</li>
+      </ul>
+      <div class="g">
+        <div class="head"><span class="tag">G2</span>Het scammer-werkblad · 1:05, 10 min, op papier</div>
+        <p>Elk paar bedenkt een voice-scam, maar maakt hem <b>niet</b>. Het werkblad (achterkant handout) vraagt:</p>
+        <ol>
+          <li>Wie is het slachtoffer?</li>
+          <li>Wiens stem gebruik je, en waar haal je die vandaan?</li>
+          <li>Welk kanaal: telefoon, spraakbericht, videogesprek?</li>
+          <li>Wat vraag je: geld, een code, gegevens?</li>
+          <li>Hoe zet je druk: tijd, emotie, geheimhouding?</li>
+          <li>Wat zou het slachtoffer laten twijfelen?</li>
+        </ol>
+        <p><b>1:15 Delen, 5 min:</b> twee paren lezen hun scenario voor. Vraag de klas: <span class="say">"Wat maakt dit overtuigend? Wat zou het breken?"</span> Schrijf de antwoorden op het bord; je gebruikt ze in G4.</p>
+        <p class="steer">De stem is maar één onderdeel. Druk, haast en een geloofwaardig verhaal doen het echte werk, en vraag 6 is waar de verdediging zit.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="block pause">
+    <div class="when"><span class="chip">1:20</span><small>slide 14</small></div>
+    <div>
+      <h3>Pauze</h3>
+      <p>Experimenten die nog lopen, lopen gewoon door.</p>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="when"><span class="chip">1:30</span><small>slide 15–17</small></div>
+    <div>
+      <h3>Kun je het detecteren? <span class="step">stap 7</span></h3>
+      <ul>
+        <li>Laat iedereen stap 7 draaien en de samenvatting bekijken.</li>
+        <li>Verwachting (controleer in de dry run, <code>dry-run.md</code>):
+          <ul>
+            <li><b>Watermerk:</b> ongeveer 1,0 op klonen en 0,0 op echte clips, en het overleeft MP3. Na de telefoonlijn was het in de test van 20 oktober weg (0,02).</li>
+            <li><b>Classifier:</b> herkende in die test de klonen, maar na de telefoonlijn noemde hij alles "echt". Verwacht ook fouten op echte stemmen: hij is getraind op oudere deepfakes.</li>
+          </ul>
+        </li>
+      </ul>
+      <div class="g">
+        <div class="head"><span class="tag">G3</span>Detectie en de wet · 10 min</div>
+        <ul>
+          <li><span class="say">"Precies het kanaal dat oplichters gebruiken, de telefoon, schakelt beide detectoren uit. Wat betekent dat?"</span></li>
+          <li><span class="say">"Het watermerk werkt alleen omdat Resemble AI het erin stopt. Wat als de oplichter een ander open model gebruikt?"</span></li>
+          <li><span class="say">"Artikel 50 van de AI Act verplicht dat deepfakes gelabeld zijn en dat synthetische audio machinaal herkenbaar is. Wat doet een label in een live telefoongesprek?"</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="when"><span class="chip">1:55</span><small>slide 18–20</small></div>
+    <div>
+      <div class="g" style="margin-top:0">
+        <div class="head"><span class="tag">G4</span>Het grote gesprek · 25 min</div>
+        <ol>
+          <li><b>Verantwoordelijkheid:</b> je stem staat online. Wie is verantwoordelijk als hij gekloond wordt: het platform, de modelmaker of de oplichter?</li>
+          <li><b>Open modellen:</b> Chatterbox is open source (MIT). De vangrails in dit notebook (alleen je eigen stem, het scamfilter) zijn één regel code. <span class="say">"Had je het scamfilter kunnen weghalen?"</span> (Ja: <code>BLOCKLIST</code> in <code>lab/texts.py</code>.) Moeten zulke modellen open zijn?</li>
+          <li><b>Verdediging:</b> pak de antwoorden van G2 erbij (<span class="say">"wat zou het breken?"</span>). Waarom verslaat een familiewachtwoord de meeste van deze scams, terwijl de detector dat niet doet?</li>
+          <li><b>Afsluiter:</b> <span class="say">"Wat ga je vanavond anders doen?"</span> Laat drie mensen antwoorden.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="when"><span class="chip">2:20</span><small>slide 21–22</small></div>
+    <div>
+      <h3>Wissen en meegeven <span class="step">stap 8</span></h3>
+      <ol>
+        <li>Iedereen draait stap 8, vinkt het vakje aan en klikt <i>Alles wissen</i>. Dit verwijdert de opnames en daarna de runtime.</li>
+        <li>Iedereen kiest <i>Bewerken → Alle uitvoer wissen</i> en sluit het tabblad zonder op te slaan.</li>
+        <li>Vraag of iemand een kopie in Drive heeft opgeslagen. Zo ja: laat diegene het bestand in Drive verwijderen.</li>
+        <li><b>Meegeven:</b> spreek thuis een familiewachtwoord af voor noodgevallen aan de telefoon.</li>
+      </ol>
+    </div>
+  </section>
+
+  <h2>Noodplannen</h2>
+  <table>
+    <thead><tr><th>Probleem</th><th>Wat je doet</th></tr></thead>
+    <tbody>
+      <tr><td>Paar krijgt geen GPU</td><td>Samen op één laptop: eerst de ene stem tot en met stap 5, daarna de ander vanaf stap 3a. Of de partner doet mee als luisteraar.</td></tr>
+      <tr><td>Installatie breekt</td><td>Zet in cel 1 vóór de installatie een regel <code>%env VCL_FULL_INSTALL=1</code>, verwijder <code>/content/.vcl_installed</code>, draai cel 1, en daarna <i>Runtime → Sessie opnieuw starten</i> en cel 1 nogmaals. Duurt langer.</td></tr>
+      <tr><td>Audiospeler blijft leeg</td><td>Zet in cel 1 <code>PLAYER</code> op <code>embed</code>. Let op: de audio staat dan in de uitvoer, dus <i>Alle uitvoer wissen</i> is verplicht.</td></tr>
+      <tr><td>Microfoon werkt niet</td><td>Andere browser (Chrome), of opnemen op de laptop van de partner.</td></tr>
+      <tr><td>Nederlands klinkt slecht</td><td>Probeer in cel 1 <code>MODEL = "v3"</code>, of gebruik de Engelse zinnen (EN1, EN2) in het gesprek.</td></tr>
+      <tr><td>Classifier laadt niet</td><td>Ga door met alleen het watermerk en het eigen oor.</td></tr>
+      <tr><td>Iedereen loopt achter</td><td>Sla de vrije modus over (het werkblad blijft) en begin stap 7 direct na de pauze.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>De code is zichtbaar en aanpasbaar</h2>
+  <p>De kern van het klonen (stap 4 en 6) en de detectie (stap 7) staat als leesbare Python in het notebook. De rest zit in <code>lab/</code>, te openen via het 📁-icoon links; wijzigingen daar werken bij de volgende cel die je uitvoert (<code>lab/live_edit.py</code>). Ideeën om studenten te laten proberen:</p>
+  <ul class="ideas">
+    <li>In stap 4 <code>REF_LENGTHS = [1, 2, 3]</code>: hoe weinig stem is genoeg? Stap 5 schudt dan automatisch die klonen.</li>
+    <li>In stap 6 de schuifjes: wat doet CFG met het accent, wat doet temperatuur met de stabiliteit?</li>
+    <li>In <code>audio.py</code> het telefoonfilter strenger of milder maken (<code>phone_line</code>): bij welke instelling overleeft het watermerk?</li>
+    <li>In <code>texts.py</code> het scamfilter bekijken: hoe makkelijk is het te omzeilen?</li>
+  </ul>
+  <p class="note">Gaat er iets stuk door een aanpassing: <i>Runtime → Sessie opnieuw starten</i> en cel 1 opnieuw draaien. Opnames blijven bewaard. De originele code terughalen kan met een nieuwe cel <code>!git -C /content/voice-clone-lab checkout -- .</code></p>
+
+  <h2>Wat de tools wel en niet afdwingen</h2>
+  <p>De stappen weigeren te werken zonder toestemming, klonen kan alleen met een referentie die live in stap 3 is opgenomen (gecontroleerd met een hash), en de vrije modus weigert scamachtige tekst. Maar studenten zien en bewerken de code, dus ze kunnen die controles ook weghalen. Het notebook noemt dat bewust niet, zodat het niet afleidt tijdens het werk.</p>
+  <p class="note"><b>Het zijn vangrails, geen sloten.</b> Gebruik dat in G4: als een student met één regel het scamfilter uitzet, wat betekent dat voor "veilige" open modellen?</p>
+</main>
+
+</body>
+</html>
