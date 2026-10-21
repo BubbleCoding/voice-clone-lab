@@ -35,8 +35,6 @@ Het loodgieterswerk zit in het pakket `lab/`. Open het via het 📁-icoon links:
 | [`texts.py`]({LAB_URL}/texts.py) | De vaste zinnen en de lijst met verboden woorden |
 | [`state.py`]({LAB_URL}/state.py) | Toestemming en de controle dat een opname echt live was |
 | [`cells.py`]({LAB_URL}/cells.py) | Knoppen, meldingen en tabellen |
-
-**Eerlijk is eerlijk:** omdat je alle code kunt aanpassen, kun je ook de controles weghalen (alleen je eigen stem, het scamfilter). Doe dat niet. Dat het zo makkelijk kan, bespreken we aan het einde van de les.
 """
 
 SETUP = f'''#@title 1. Setup: start deze cel meteen (duurt ongeveer 4 minuten)
@@ -61,7 +59,7 @@ from lab import cells as ui
 ui.setup(player_mode=PLAYER, model=MODEL)'''
 
 EXPERIMENT = '''# Settings: change them and run the cell again.
-REF_LENGTHS = [3, 6, 10]   # seconds of your voice; Chatterbox never uses more than 10
+REF_LENGTHS = [3, 6, 10]   # seconds of your voice the model gets to hear
 SETTINGS = dict(exaggeration=0.5, cfg_weight=0.5, temperature=0.8)
 
 model = clone.require_model()             # Chatterbox Multilingual, loaded in step 1
@@ -151,7 +149,6 @@ CELLS = [
     ("code", "ui.record_target()"),
     ("md", "## 4. Experiment: hoeveel stem is genoeg?\nDit is de hele kloon-code. Het model maakt vier zinnen (twee Nederlands, twee Engels) "
            "met **3, 6 en 10 seconden** van jouw stem als voorbeeld. Let op de generatietijd per clip.\n\n"
-           "Wist je dat Chatterbox nooit meer dan 10 seconden van je stem gebruikt? Meer audio maakt de kloon niet beter.\n\n"
            "Laat `REF_LENGTHS` op 3, 6 en 10 staan voor de luistertest. Daarna mag je alles proberen."),
     ("code", EXPERIMENT),
     ("md", "## 5. Vrije modus\nTyp rechts een zin en speel met de instellingen. Iemand anders nadoen of om geld, codes of gegevens vragen is **niet** toegestaan."),

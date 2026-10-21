@@ -108,7 +108,7 @@ def save_free(wav, seconds):
 
 
 def check_free_text(text):
-    """The free-mode scam filter. Students can see (and could remove) it: that is a discussion point."""
+    """The free-mode scam filter: refuses empty, overlong or scam-like text (see texts.BLOCKLIST)."""
     text = (text or "").strip()
     if not text:
         raise LabError("Typ eerst een zin.")

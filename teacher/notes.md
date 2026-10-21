@@ -100,4 +100,4 @@ Gaat er iets stuk door een aanpassing: *Runtime → Sessie opnieuw starten* en c
 
 ## Wat de tools wel en niet afdwingen
 
-De stappen weigeren te werken zonder toestemming, klonen kan alleen met een referentie die live in stap 3 is opgenomen (gecontroleerd met een hash), en de vrije modus weigert scamachtige tekst. Maar studenten zien en bewerken de code, dus ze kunnen die controles ook weghalen; het notebook zegt dat ook eerlijk. Het zijn vangrails, geen sloten. Gebruik dat in de discussie: als een student met één regel het scamfilter uitzet, wat betekent dat voor "veilige" open modellen?
+De stappen weigeren te werken zonder toestemming, klonen kan alleen met een referentie die live in stap 3 is opgenomen (gecontroleerd met een hash), en de vrije modus weigert scamachtige tekst. Maar studenten zien en bewerken de code, dus ze kunnen die controles ook weghalen. Het notebook noemt dat bewust niet, zodat het niet afleidt tijdens het werk. Het zijn vangrails, geen sloten. Gebruik dat in de discussie: als een student met één regel het scamfilter uitzet, wat betekent dat voor "veilige" open modellen?
